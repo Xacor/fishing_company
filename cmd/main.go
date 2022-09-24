@@ -16,7 +16,7 @@ func main() {
 	dbUrl := viper.Get("DB_URL").(string)
 
 	router := gin.Default()
-	router.LoadHTMLGlob("ui/html/*")
+	router.LoadHTMLGlob("ui/html/**/*")
 
 	handler := db.Init(dbUrl)
 
