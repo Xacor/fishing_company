@@ -10,6 +10,8 @@ import (
 
 func (h handler) GetBoat(c *gin.Context) {
 	var boat models.Boat
+
+	//TO DO: rewrite to get by id
 	if result := h.DB.First(&boat); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
