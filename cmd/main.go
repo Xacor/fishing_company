@@ -34,6 +34,5 @@ func main() {
 	handler := db.Init(conf.DBUrl)
 
 	boats.RegisterRoutes(router, handler)
-
 	router.Run(conf.Port)
 }
