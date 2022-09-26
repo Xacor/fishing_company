@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  fishing_database: #Имя сервиса
+    container_name: fishing_database #Имя с которым запустится контейнер
+    hostname: fishing_database #Имя "хоста" которым будет считать себя контейнер
+    image: mysql #Образ из которого запускается контейнер
+    volumes: #Подключаемые директории
+      - ~/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
+    environment: #переменные окружения
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    # healthcheck:
+    #     test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5 
+    ports: # Сопоставление портов хост-машины и контейнера
+      - 3306:3306
+
+    restart: unless-stopped #условие для рестарта в случае остановки контейнера
+
+  fishing_webserver:
+      container_name: fishing_webserver
+      hostname: fishing_webserver
+      build:
+          context: ./
+          dockerfile: dockerfile
+      ports:
+        - 5000:5000
+      volumes:
+        - ~/fishing_logs:/var/logs/fishing
+      restart: on-failure
+      
+      depends_on:
+        - fishing_database
