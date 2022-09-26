@@ -10,7 +10,7 @@ import (
 
 func (h handler) GetBoats(c *gin.Context) {
 	var boats []models.Boat
-	result := h.DB.First(&boats)
+	result := h.DB.Find(&boats)
 	if result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return

@@ -11,12 +11,13 @@ import (
 func (h handler) GetBoat(c *gin.Context) {
 	var boat models.Boat
 
-	//TO DO: rewrite to get by id
-	if result := h.DB.First(&boat); result.Error != nil {
+	id := c.Param("id")
+
+	if result := h.DB.First(&boat, id); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
-	c.HTML(http.StatusOK, "base.html", gin.H{
-		"Name": &boat.Name,
+	c.HTML(http.StatusOK, "show_boat.html", gin.H{
+		"boat": boat,
 	})
 }

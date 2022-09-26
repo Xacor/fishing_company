@@ -2,12 +2,13 @@ package boats
 
 import (
 	"fishing_company/pkg/common/models"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/datatypes"
 )
 
 func (h handler) BoatForm(c *gin.Context) {
@@ -22,12 +23,13 @@ func (h handler) CreateBoat(c *gin.Context) {
 
 	//"02/01/2006" лучше вынести константой
 	date, _ := time.Parse("2006-01-02", c.PostForm("build_date"))
-	boat.Build_date = datatypes.Date(date)
+	boat.Build_date = date
 
 	if result := h.DB.Create(&boat); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
-	//редирект в таком виде не работает
-	c.Redirect(http.StatusCreated, "/")
+
+	dest_url := url.URL{Path: fmt.Sprintf("/boats/%d", boat.ID)}
+	c.Redirect(http.StatusMovedPermanently, dest_url.String())
 }
