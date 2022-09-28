@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"fishing_company/pkg/common/models"
+	"fishing_company/pkg/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,7 +22,7 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 			return nil, fmt.Errorf("db connection failed after %s timeout", timeout)
 
 		case <-ticker.C:
-			db, err := gorm.Open(dialecor, &gorm.Config{})
+			db, err := gorm.Open(dialecor)
 			if err == nil {
 				return db, nil
 			}

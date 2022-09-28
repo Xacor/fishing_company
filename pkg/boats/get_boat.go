@@ -3,7 +3,7 @@ package boats
 import (
 	"net/http"
 
-	"fishing_company/pkg/common/models"
+	"fishing_company/pkg/models"
 
 	"github.com/gin-gonic/gin"
 )

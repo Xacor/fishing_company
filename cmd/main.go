@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fishing_company/pkg/common/boats"
-	"fishing_company/pkg/common/config"
-	"fishing_company/pkg/common/db"
+	"fishing_company/pkg/boats"
+	"fishing_company/pkg/config"
+	"fishing_company/pkg/db"
 	"io"
 	"os"
 
@@ -31,8 +31,8 @@ func main() {
 	router.Use(gin.Recovery())
 	router.LoadHTMLGlob("ui/html/**/*")
 
-	handler := db.Init(conf.DBUrl)
+	db := db.Init(conf.DBUrl)
 
-	boats.RegisterRoutes(router, handler)
+	boats.RegisterRoutes(router, db)
 	router.Run(conf.Port)
 }
