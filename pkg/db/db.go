@@ -22,7 +22,7 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 			return nil, fmt.Errorf("db connection failed after %s timeout", timeout)
 
 		case <-ticker.C:
-			db, err := gorm.Open(dialecor, &gorm.Config{})
+			db, err := gorm.Open(dialecor)
 			if err == nil {
 				return db, nil
 			}

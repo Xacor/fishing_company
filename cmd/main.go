@@ -31,8 +31,8 @@ func main() {
 	router.Use(gin.Recovery())
 	router.LoadHTMLGlob("ui/html/**/*")
 
-	handler := db.Init(conf.DBUrl)
+	db := db.Init(conf.DBUrl)
 
-	boats.RegisterRoutes(router, handler)
+	boats.RegisterRoutes(router, db)
 	router.Run(conf.Port)
 }
