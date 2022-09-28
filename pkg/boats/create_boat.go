@@ -1,7 +1,7 @@
 package boats
 
 import (
-	"fishing_company/pkg/common/models"
+	"fishing_company/pkg/models"
 	"fmt"
 	"net/http"
 	"net/url"

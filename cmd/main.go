@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fishing_company/pkg/common/boats"
-	"fishing_company/pkg/common/config"
-	"fishing_company/pkg/common/db"
+	"fishing_company/pkg/boats"
+	"fishing_company/pkg/config"
+	"fishing_company/pkg/db"
 	"io"
 	"os"
 
