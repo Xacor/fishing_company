@@ -31,7 +31,8 @@
               <div class="btn-group" role="group" aria-label="Basic example">
                 <a class="btn btn-primary" href="/boats/{{ $boat.ID }}">Просмотр</a>
                 <a class="btn btn-secondary" href="/boats/{{ $boat.ID }}/update">Редактировать</a>
-                <button type="button" class="btn btn-danger" data-url="" data-bs-toggle="modal" data-bs-target="#delete-user-modal">Удалить</button>
+                <button type="button" class="btn btn-danger" data-url="/boats/{{ $boat.ID }}/delete" data-bs-toggle="modal" data-bs-target="#delete-boat-modal">Удалить</button>
+                <a class="btn btn-danger" href="/boats/{{ $boat.ID }}/delete">Жестко удалить</a>
               </div>
             </td>
           </tr>
@@ -40,7 +41,7 @@
       </thead>
     </table>
     <a class="btn btn-primary" href="/boats/new">Создать лодку</a>
-    <div class="modal fade" id="delete-user-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="delete-boat-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-center">
         <div class="modal-content">
           <div class="modal-header">
@@ -64,5 +65,7 @@
       integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
       crossorigin="anonymous">
     </script>
+    <!-- не знаю какой путь указать -->
+    <script src="/static/main.js"></script>
   </body>
 </html>
