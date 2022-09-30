@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB
+
 func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, err error) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
@@ -31,7 +33,7 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 	}
 }
 
-func Init(url string) *gorm.DB {
+func Init(url string) {
 	db, err := ConnectLoop(time.Second*10, mysql.Open(url))
 
 	if err != nil {
@@ -39,5 +41,5 @@ func Init(url string) *gorm.DB {
 	}
 
 	db.AutoMigrate(&models.Boat{})
-	return db
+	DB = db
 }
