@@ -19,4 +19,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	routes.GET("/new", h.BoatForm)
 	routes.POST("/create", h.CreateBoat)
 	routes.GET("/:id", h.GetBoat)
+	routes.GET("/:id/update", h.UpdateBoatForm)
+	routes.POST("/:id/update", h.UpdateBoat)
 }
