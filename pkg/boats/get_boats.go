@@ -3,14 +3,15 @@ package boats
 import (
 	"net/http"
 
+	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h handler) GetBoats(c *gin.Context) {
+func GetBoats(c *gin.Context) {
 	var boats []models.Boat
-	result := h.DB.Find(&boats)
+	result := db.DB.Find(&boats)
 	if result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
