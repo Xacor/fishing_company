@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Boat struct {
@@ -10,5 +12,8 @@ type Boat struct {
 	BtypeID      uint8     `gorm:"not null"`
 	Displacement uint16    `gorm:"not null"`
 	Build_date   time.Time `gorm:"not null"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 	Btype        Btype
 }
