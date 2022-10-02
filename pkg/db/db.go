@@ -40,6 +40,6 @@ func Init(url string) {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&models.Boat{})
+	db.AutoMigrate(&models.Boat{}, &models.User{})
 	DB = db
 }
