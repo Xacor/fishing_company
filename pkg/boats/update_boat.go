@@ -6,17 +6,18 @@ import (
 	"net/url"
 	"strconv"
 
+	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h handler) UpdateBoatForm(c *gin.Context) {
+func UpdateBoatForm(c *gin.Context) {
 	boatId := c.Param("id")
 
 	var boat models.Boat
 
-	if result := h.DB.First(&boat, boatId); result.Error != nil {
+	if result := db.DB.First(&boat, boatId); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
@@ -26,13 +27,13 @@ func (h handler) UpdateBoatForm(c *gin.Context) {
 	})
 }
 
-func (h handler) UpdateBoat(c *gin.Context) {
+func UpdateBoat(c *gin.Context) {
 
 	boatId := c.Param("id")
 
 	var boat models.Boat
 
-	if result := h.DB.First(&boat, boatId); result.Error != nil {
+	if result := db.DB.First(&boat, boatId); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
@@ -51,7 +52,7 @@ func (h handler) UpdateBoat(c *gin.Context) {
 		boat.Displacement = uint16(boatDisplacement)
 	}
 
-	if result := h.DB.Save(&boat); result.Error != nil {
+	if result := db.DB.Save(&boat); result.Error != nil {
 		c.AbortWithError(http.StatusNotModified, result.Error)
 		return
 	}
