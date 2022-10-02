@@ -19,10 +19,14 @@ func BoatForm(c *gin.Context) {
 func CreateBoat(c *gin.Context) {
 	var boat models.Boat
 	boat.Name = c.PostForm("name")
-	boat.Type, _ = strconv.Atoi(c.PostForm("type"))
-	boat.Displacement, _ = strconv.Atoi(c.PostForm("displacement"))
 
-	//"02/01/2006" лучше вынести константой
+	typeID, _ := strconv.Atoi(c.PostForm("type"))
+	boat.BtypeID = uint8(typeID)
+
+	displacement, _ := strconv.Atoi(c.PostForm("displacement"))
+	boat.Displacement = uint16(displacement)
+
+	//"2006-01-02" лучше вынести константой
 	date, _ := time.Parse("2006-01-02", c.PostForm("build_date"))
 	boat.Build_date = date
 
