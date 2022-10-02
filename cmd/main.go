@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fishing_company/pkg/auth"
 	"fishing_company/pkg/boats"
 	"fishing_company/pkg/config"
 	"fishing_company/pkg/db"
 	"io"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,6 +30,11 @@ func main() {
 	}
 
 	router := gin.New()
+
+	//replace with normal auth key
+	store := memstore.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("session", store))
+
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
 	router.LoadHTMLGlob("ui/html/**/*")
@@ -34,5 +42,8 @@ func main() {
 	db.Init(conf.DBUrl)
 
 	boats.RegisterRoutes(router)
+	router.POST("/login", auth.Login)
+	router.GET("/logout", auth.AuthRequired(), auth.Logout)
+	router.GET("/profile", auth.AuthRequired(), auth.Profile)
 	router.Run(conf.Port)
 }
