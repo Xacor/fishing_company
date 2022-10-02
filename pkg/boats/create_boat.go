@@ -1,6 +1,7 @@
 package boats
 
 import (
+	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
 	"fmt"
 	"net/http"
@@ -11,11 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h handler) BoatForm(c *gin.Context) {
+func BoatForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "create_boat.html", gin.H{})
 }
 
-func (h handler) CreateBoat(c *gin.Context) {
+func CreateBoat(c *gin.Context) {
 	var boat models.Boat
 	boat.Name = c.PostForm("name")
 
@@ -29,7 +30,7 @@ func (h handler) CreateBoat(c *gin.Context) {
 	date, _ := time.Parse("2006-01-02", c.PostForm("build_date"))
 	boat.Build_date = date
 
-	if result := h.DB.Create(&boat); result.Error != nil {
+	if result := db.DB.Create(&boat); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
