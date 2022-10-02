@@ -20,6 +20,10 @@ type Credentials struct {
 	Password string `form:"password"`
 }
 
+func LoginForm(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", gin.H{})
+}
+
 // Session data stored in memory, but session token stored in clients cookies
 func Login(c *gin.Context) {
 	var creds Credentials
@@ -37,21 +41,17 @@ func Login(c *gin.Context) {
 	}
 
 	sessionToken := uuid.NewString()
-
 	session.Set(sessionToken, creds.Username)
+
 	err = session.Save()
 	if err != nil {
 		c.Error(err)
 	}
 
-	cookie, err := c.Cookie(tokenkey)
-	if err != nil {
-		cookie = "NotSet"
-		c.SetCookie(tokenkey, sessionToken, 3600, "/", "localhost", false, false)
-	}
+	c.SetCookie(tokenkey, sessionToken, 3600, "/", "localhost", false, false)
 
 	//replace with render some html
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user", "cookie": cookie})
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
 }
 
 func Logout(c *gin.Context) {
@@ -78,10 +78,7 @@ func AuthRequired() gin.HandlerFunc {
 			// render html or flash message???
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authorized"})
 			c.Abort()
-			return
 		}
-
-		c.Next()
 	}
 }
 
@@ -90,4 +87,17 @@ func Profile(c *gin.Context) {
 	token, _ := c.Cookie(tokenkey)
 	user := session.Get(token)
 	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
+// Обновляет время действия токена при каждмом действии пользователя.
+// Возможно надо переделать по таймауту или как то еще
+func TokenTimeoutRefresh() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := c.Cookie(tokenkey)
+		if err != nil {
+			c.Error(err)
+
+		}
+		c.SetCookie(tokenkey, token, 3600, "/", "localhost", false, false)
+	}
 }

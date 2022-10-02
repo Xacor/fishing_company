@@ -42,8 +42,6 @@ func main() {
 	db.Init(conf.DBUrl)
 
 	boats.RegisterRoutes(router)
-	router.POST("/login", auth.Login)
-	router.GET("/logout", auth.AuthRequired(), auth.Logout)
-	router.GET("/profile", auth.AuthRequired(), auth.Profile)
+	auth.RegisterRoutes(router)
 	router.Run(conf.Port)
 }
