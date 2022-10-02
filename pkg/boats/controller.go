@@ -12,5 +12,8 @@ func RegisterRoutes(r *gin.Engine) {
 	routes.GET("/new", BoatForm)
 	routes.POST("/create", CreateBoat)
 	routes.GET("/:id", GetBoat)
-
+	routes.GET("/:id/update", UpdateBoatForm)
+	routes.POST("/:id/update", UpdateBoat)
+	routes.GET("/:id/delete", DeleteBoatForm)
+	routes.POST("/:id/delete", DeleteBoat)
 }

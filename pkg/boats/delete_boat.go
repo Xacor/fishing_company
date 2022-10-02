@@ -1,19 +1,19 @@
 package boats
 
 import (
+	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
-	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h handler) DeleteBoatForm(c *gin.Context) {
+func DeleteBoatForm(c *gin.Context) {
 	boatID := c.Param("id")
 	var boat models.Boat
 
-	if result := h.DB.First(&boat, boatID); result.Error != nil {
+	if result := db.DB.First(&boat, boatID); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
@@ -24,16 +24,15 @@ func (h handler) DeleteBoatForm(c *gin.Context) {
 	})
 }
 
-func (h handler) DeleteBoat(c *gin.Context) {
+func DeleteBoat(c *gin.Context) {
 	boatID := c.Param("id")
 	if c.PostForm("boatName") != c.PostForm("inputBoatName") {
 		c.Redirect(http.StatusMovedPermanently, "/boats")
 		return
 	}
 	var boat models.Boat
-	result := h.DB.First(&boat, boatID)
-	if result = h.DB.Delete(&boat); result.Error != nil {
-		fmt.Println("AAAAAAAAAAAAAAAA")
+	result := db.DB.First(&boat, boatID)
+	if result = db.DB.Delete(&boat); result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}

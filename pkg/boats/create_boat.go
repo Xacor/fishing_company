@@ -34,7 +34,6 @@ func CreateBoat(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
-
 	dest_url := url.URL{Path: fmt.Sprintf("/boats/%d", boat.ID)}
 	c.Redirect(http.StatusMovedPermanently, dest_url.String())
 }
