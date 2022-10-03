@@ -6,6 +6,7 @@ import (
 	"fishing_company/pkg/config"
 	"fishing_company/pkg/db"
 	"io"
+	"log"
 	"os"
 
 	"github.com/gin-contrib/sessions"
@@ -16,7 +17,7 @@ import (
 func main() {
 	conf, err := config.LoadConfig()
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	switch conf.LogO {

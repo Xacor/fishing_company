@@ -23,13 +23,13 @@ func LoadConfig() (c Config, err error) {
 	err = viper.ReadInConfig()
 	if err != nil {
 		err = fmt.Errorf("fatal error config file: %w", err)
-		return Config{}, err
+		return
 	}
 
 	err = viper.Unmarshal(&c)
 	if err != nil {
 		err = fmt.Errorf("unable to decode into struct, %v", err)
-		return Config{}, err
+		return
 	}
 	return
 }
