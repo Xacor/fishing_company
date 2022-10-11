@@ -25,7 +25,7 @@ services:
         - 5000:5000
       volumes:
         - /home/user/fishing_logs/:/var/log/fishing/
-        - /home/user/envs/:/usr/src/fishing_company/envs
+        - /home/user/envs/:/usr/src/fishing_company/envs/
       restart: on-failure
       
       depends_on:
