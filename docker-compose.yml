@@ -7,7 +7,7 @@ services:
     hostname: fishing_database #Имя "хоста" которым будет считать себя контейнер
     image: mysql #Образ из которого запускается контейнер
     volumes: #Подключаемые директории
-      - /home/kali/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
+      - /home/nva/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
     environment: #переменные окружения
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
@@ -20,13 +20,15 @@ services:
   fishing_webserver:
       container_name: fishing_webserver
       hostname: fishing_webserver
+      image: deeezy/golang-project
       build:
           context: ./
           dockerfile: dockerfile
       ports:
         - 5000:5000
       volumes:
-        - /home/kali/fishing_logs/:/var/log/fishing/
+        - /home/nva/fishing_logs/:/var/log/fishing/
+        - /home/nva/envs/:/usr/src/fishing_company/envs/
       restart: on-failure
       
       depends_on:
