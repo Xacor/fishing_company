@@ -20,7 +20,7 @@ services:
   fishing_webserver:
       container_name: fishing_webserver
       hostname: fishing_webserver
-      image: xacor/fishing:latest
+      image: xacor/fishing
       ports:
         - 5000:5000
       volumes:
