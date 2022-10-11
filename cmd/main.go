@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//random comment
+
 func main() {
 	conf, err := config.LoadConfig()
 	if err != nil {
