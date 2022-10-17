@@ -40,6 +40,8 @@ func Init(url string) {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&models.Boat{}, &models.User{})
+	if err = db.AutoMigrate(&models.Boat{}, &models.User{}); err != nil {
+		log.Fatalln(err)
+	}
 	DB = db
 }

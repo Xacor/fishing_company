@@ -1,6 +1,7 @@
 package boats
 
 import (
+	"log"
 	"net/http"
 
 	"fishing_company/pkg/db"
@@ -15,7 +16,10 @@ func GetBoat(c *gin.Context) {
 	id := c.Param("id")
 
 	if result := db.DB.First(&boat, id); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 	c.HTML(http.StatusOK, "show_boat.html", gin.H{

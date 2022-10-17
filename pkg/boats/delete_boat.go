@@ -3,6 +3,7 @@ package boats
 import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -14,7 +15,10 @@ func DeleteBoatForm(c *gin.Context) {
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatID); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 
@@ -28,12 +32,16 @@ func DeleteBoat(c *gin.Context) {
 	boatID := c.Param("id")
 	if c.PostForm("boatName") != c.PostForm("inputBoatName") {
 		c.Redirect(http.StatusMovedPermanently, "/boats")
+
 		return
 	}
 	var boat models.Boat
-	result := db.DB.First(&boat, boatID)
-	if result = db.DB.Delete(&boat); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+	_ = db.DB.First(&boat, boatID)
+	if result := db.DB.Delete(&boat); result.Error != nil {
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Print(err)
+		}
+
 		return
 	}
 

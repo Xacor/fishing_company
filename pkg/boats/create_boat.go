@@ -4,6 +4,7 @@ import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,7 +32,10 @@ func CreateBoat(c *gin.Context) {
 	boat.Build_date = date
 
 	if result := db.DB.Create(&boat); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 	dest_url := url.URL{Path: fmt.Sprintf("/boats/%d", boat.ID)}
