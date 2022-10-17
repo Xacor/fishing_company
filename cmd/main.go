@@ -19,7 +19,7 @@ import (
 func main() {
 	conf, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatalln(err.Error())
 	}
 
 	switch conf.LogO {
@@ -46,5 +46,7 @@ func main() {
 
 	boats.RegisterRoutes(router)
 	auth.RegisterRoutes(router)
-	router.Run(conf.Port)
+	if err := router.Run(conf.Port); err != nil {
+		log.Fatalln(err)
+	}
 }

@@ -3,6 +3,7 @@ package auth
 import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -30,7 +31,10 @@ func Login(c *gin.Context) {
 	err := c.ShouldBind(&creds)
 	if err != nil {
 		// render some html
-		c.Error(err)
+
+		if err1 := c.Error(err); err1 != nil {
+			log.Println(err)
+		}
 	}
 
 	var user models.User
@@ -51,7 +55,9 @@ func Login(c *gin.Context) {
 
 	err = session.Save()
 	if err != nil {
-		c.Error(err)
+		if err1 := c.Error(err); err1 != nil {
+			log.Println(err)
+		}
 	}
 
 	c.SetCookie(tokenkey, sessionToken, 3600, "/", "localhost", false, false)
@@ -76,7 +82,9 @@ func AuthRequired() gin.HandlerFunc {
 		session := sessions.Default(c)
 		token, err := c.Cookie(tokenkey)
 		if err != nil {
-			c.Error(err)
+			if err1 := c.Error(err); err1 != nil {
+				log.Println(err1)
+			}
 		}
 
 		user := session.Get(token)
@@ -101,7 +109,9 @@ func TokenTimeoutRefresh() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie(tokenkey)
 		if err != nil {
-			c.Error(err)
+			if err1 := c.Error(err); err != nil {
+				log.Println(err1)
+			}
 
 		}
 		c.SetCookie(tokenkey, token, 3600, "/", "localhost", false, false)
@@ -122,13 +132,17 @@ func Register(c *gin.Context) {
 	var creds RegisterCred
 	err := c.ShouldBind(&creds)
 	if err != nil {
-		c.Error(err)
+		if err1 := c.Error(err); err1 != nil {
+			log.Println(err1)
+		}
 	}
 
 	if creds.Pwd == creds.ConfPwd {
 		hash, e := bcrypt.GenerateFromPassword([]byte(creds.Pwd), bcrypt.DefaultCost)
 		if e != nil {
-			c.Error(e)
+			if err1 := c.Error(e); err1 != nil {
+				log.Println(err1)
+			}
 		}
 
 		newUser := models.User{
@@ -136,8 +150,8 @@ func Register(c *gin.Context) {
 			Password: string(hash),
 		}
 
-		//проверка на существование пользователя с таким именем
-		//полученная модель опускается, важен только reult
+		// проверка на существование пользователя с таким именем
+		// полученная модель опускается, важен только reult
 		result := db.DB.Where(&models.User{Name: newUser.Name}).First(&models.User{})
 		if result.Error == nil {
 			c.JSON(http.StatusOK, gin.H{"error": "user with this name already exist"})
@@ -145,7 +159,9 @@ func Register(c *gin.Context) {
 		}
 
 		if result = db.DB.Create(&newUser); result.Error != nil {
-			c.AbortWithError(http.StatusNotFound, result.Error)
+			if err1 := c.AbortWithError(http.StatusNotFound, result.Error); err1 != nil {
+				log.Println(err1)
+			}
 			return
 		}
 		c.Redirect(http.StatusMovedPermanently, "/login")

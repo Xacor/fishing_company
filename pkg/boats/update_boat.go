@@ -2,6 +2,7 @@ package boats
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -18,7 +19,10 @@ func UpdateBoatForm(c *gin.Context) {
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 
@@ -34,7 +38,10 @@ func UpdateBoat(c *gin.Context) {
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 
@@ -53,7 +60,10 @@ func UpdateBoat(c *gin.Context) {
 	}
 
 	if result := db.DB.Save(&boat); result.Error != nil {
-		c.AbortWithError(http.StatusNotModified, result.Error)
+		if err := c.AbortWithError(http.StatusNotModified, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 

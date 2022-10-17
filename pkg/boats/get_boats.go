@@ -1,6 +1,7 @@
 package boats
 
 import (
+	"log"
 	"net/http"
 
 	"fishing_company/pkg/db"
@@ -13,7 +14,10 @@ func GetBoats(c *gin.Context) {
 	var boats []models.Boat
 	result := db.DB.Find(&boats)
 	if result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
 		return
 	}
 	c.HTML(http.StatusOK, "all_boats.html", gin.H{
