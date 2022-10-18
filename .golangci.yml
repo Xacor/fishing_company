@@ -1,0 +1,7 @@
+linters-settings:
+  gosec:
+    # Filter out the issues with a lower severity than the given value.
+    # Valid options are: low, medium, high.
+    # Default: low
+    severity: high
+    confidence: high
