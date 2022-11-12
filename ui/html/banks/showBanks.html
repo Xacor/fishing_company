@@ -20,9 +20,8 @@
                 <td>{{$bank.Lng}}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <a class="btn btn-primary" href="">Просмотреть</a>
-                        <a class="btn btn-secondary" href="">Редактировать</a>
-                        <a class="btn btn-danger" href="">Удалить</a>
+                        <a class="btn btn-primary" href="/banks/{{ $bank.ID }}">Просмотреть</a>
+                        <a class="btn btn-danger" href="/banks/{{ $bank.ID }}/delete">Удалить</a>
                     </div>
                 </td>
             </tr>

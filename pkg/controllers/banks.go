@@ -29,7 +29,6 @@ func GetBanks(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
-
 	c.HTML(http.StatusOK, "banks", gin.H{
 		"Number": result.RowsAffected,
 		"Banks":  &banks,
@@ -48,12 +47,24 @@ func CreateBank(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
 	if result := db.DB.Create(&bank); result.Error != nil {
 		c.AbortWithError(http.StatusInternalServerError, result.Error)
 		return
 	}
 
 	dest_url := url.URL{Path: fmt.Sprintf("/banks/%d", bank.ID)}
+	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+}
+
+func DeleteBank(c *gin.Context) {
+	bankID := c.Param("id")
+	var bank models.SeaBank
+	_ = db.DB.First(&bank, bankID)
+	if result := db.DB.Delete(&bank); result.Error != nil {
+		c.AbortWithError(http.StatusNotFound, result.Error)
+		return
+	}
+
+	dest_url := url.URL{Path: "/banks"}
 	c.Redirect(http.StatusMovedPermanently, dest_url.String())
 }
