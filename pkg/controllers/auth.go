@@ -1,4 +1,4 @@
-package auth
+package controllers
 
 import (
 	"fishing_company/pkg/db"
@@ -17,6 +17,12 @@ const tokenkey = "session_token"
 type Credentials struct {
 	Username string `form:"username"`
 	Password string `form:"password"`
+}
+
+type RegisterCred struct {
+	Username string `form:"username"`
+	Pwd      string `form:"password"`
+	ConfPwd  string `form:"conf-password"`
 }
 
 func LoginForm(c *gin.Context) {
@@ -118,12 +124,6 @@ func TokenTimeoutRefresh() gin.HandlerFunc {
 	}
 }
 
-type RegisterCred struct {
-	Username string `form:"username"`
-	Pwd      string `form:"password"`
-	ConfPwd  string `form:"conf-password"`
-}
-
 func RegisterForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "register.html", gin.H{})
 }
@@ -169,5 +169,4 @@ func Register(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{"error": "passwords dont match"})
 	}
-
 }
