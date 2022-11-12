@@ -1,0 +1,35 @@
+{{define "banks" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <h3>Всего банок: {{.Number}}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Ширина</th>
+                <th scope="col">Долгота</th>
+            </tr>
+        <tbody>
+            {{range $index, $bank := .Banks}}
+            <tr>
+                <th scope="row">{{ $bank.ID }}</th>
+                <td>{{$bank.Name}}</td>
+                <td>{{$bank.Lat}}</td>
+                <td>{{$bank.Lng}}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a class="btn btn-primary" href="">Просмотреть</a>
+                        <a class="btn btn-secondary" href="">Редактировать</a>
+                        <a class="btn btn-danger" href="">Удалить</a>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+</div>
+{{template "footer" -}}
+{{end}}
