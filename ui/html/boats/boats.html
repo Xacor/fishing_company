@@ -1,0 +1,38 @@
+{{define "boats" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <h1>Всего лодок {{.Number}}</h1>
+    <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Название</th>
+        <th scope="col">Тип</th>
+        <th scope="col">Водоизмещение</th>
+        <th scope="col">Дата постройки</th>
+        <th scope="col">Действия</th>
+      </tr>
+    <tbody>
+      {{range $index, $boat := .Boats}}
+      <tr>
+        <th scope="row">{{ $boat.ID }}</th>
+        <td>{{$boat.Name}}</td>
+        <td>{{$boat.BtypeID}}</td>
+        <td>{{$boat.Displacement}}</td>
+        <td>{{$boat.Build_date.Format "2006-01-02"}}</td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-primary" href="/boats/{{ $boat.ID }}">Просмотруть</a>
+            <a class="btn btn-secondary" href="/boats/{{ $boat.ID }}/update">Редактировать</a>
+            <a class="btn btn-danger" href="/boats/{{ $boat.ID }}/delete">Удалить</a>
+          </div>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+    </thead>
+  </table>
+</div>
+{{template "footer" -}}
+{{end}}

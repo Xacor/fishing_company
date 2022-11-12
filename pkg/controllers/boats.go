@@ -109,7 +109,7 @@ func GetBoats(c *gin.Context) {
 
 		return
 	}
-	c.HTML(http.StatusOK, "all_boats.html", gin.H{
+	c.HTML(http.StatusOK, "boats", gin.H{
 		"Number": result.RowsAffected,
 		"Boats":  &boats,
 	})

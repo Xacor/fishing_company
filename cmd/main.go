@@ -40,7 +40,8 @@ func main() {
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
 	routes.RegisterRoutes(&router.RouterGroup)
-	router.LoadHTMLGlob("ui/html/**/*")
+	router.LoadHTMLGlob("ui/html/*/*.html")
+	//router.LoadHTMLGlob("ui/html/**/*")
 
 	db.Init(conf.DBUrl)
 
