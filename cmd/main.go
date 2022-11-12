@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fishing_company/pkg/auth"
-	"fishing_company/pkg/boats"
 	"fishing_company/pkg/config"
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/routes"
 	"io"
 	"log"
 	"os"
@@ -40,12 +39,12 @@ func main() {
 
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
-	router.LoadHTMLGlob("ui/html/**/*")
+	routes.RegisterRoutes(&router.RouterGroup)
+	router.LoadHTMLGlob("ui/html/*/*.html")
+	//router.LoadHTMLGlob("ui/html/**/*")
 
 	db.Init(conf.DBUrl)
 
-	boats.RegisterRoutes(router)
-	auth.RegisterRoutes(router)
 	if err := router.Run(conf.Port); err != nil {
 		log.Fatalln(err)
 	}
