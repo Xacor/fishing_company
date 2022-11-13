@@ -7,4 +7,5 @@ func RegisterRoutes(superRoute *gin.RouterGroup) {
 	authRoutes(superRoute)
 	indexRoutes(superRoute)
 	bankRoutes(superRoute)
+	fishRoutes(superRoute)
 }
