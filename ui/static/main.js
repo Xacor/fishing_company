@@ -8,13 +8,21 @@
 
 
 window.onload = function() {
-    var myModalEl = document.getElementById('delete-bank-modal')
-    myModalEl.addEventListener('show.bs.modal', function (event) {
+    console.log("aaaaaaaa");
+    var myModalElboat = document.getElementById('delete-boat-modal')
+    myModalElboat.addEventListener('show.bs.modal', function (event) {
         let form = this.querySelector('form');
         form.action = event.relatedTarget.dataset.url;
 
-        let bankNameElement = document.getElementById('bank_name_modal');
-        bankNameElement.innerHTML = event.relatedTarget.closest('tr').querySelector('#bank-name').textContent;
+        let boatNameElement = document.getElementById('boat_name_modal');
+        boatNameElement.innerHTML = event.relatedTarget.closest('tr').querySelector('#boat-name').textContent;
     })
-    
+    var myModalElBoat = document.getElementById('delete-boat-modal')
+    myModalElBoat.addEventListener('show.bs.modal', function (event) {
+        let form = this.querySelector('form');
+        form.action = event.relatedTarget.dataset.url;
+
+        let boatNameElement = document.getElementById('boat_name_modal');
+        boatNameElement.innerHTML = event.relatedTarget.closest('tr').querySelector('#boat-name').textContent;
+    })
 }
