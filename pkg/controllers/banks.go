@@ -31,7 +31,7 @@ func GetBanks(c *gin.Context) {
 	}
 	c.HTML(http.StatusOK, "banks", gin.H{
 		"Number": result.RowsAffected,
-		"Banks":  &banks,
+		"banks":  &banks,
 	})
 }
 

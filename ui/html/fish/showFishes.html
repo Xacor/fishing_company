@@ -1,28 +1,23 @@
-{{define "banks" -}}
+{{define "fishes" -}}
 {{template "header" -}}
 {{template "navbar" . -}}
 <div class="container-lg">
-    <h3>Всего банок: {{.Number}}</h3>
+    <h3>Всего сортов рыбы: {{.Number}}</h3>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Название</th>
-                <th scope="col">Широта</th>
-                <th scope="col">Долгота</th>
             </tr>
         <tbody>
-            {{range $index, $bank := .banks}}
+            {{range $index, $fish := .fishes}}
             <tr>
-                <th scope="row">{{ $bank.ID }}</th>
-                <td id="bank-name">{{$bank.Name}}</td>
-                <td>{{$bank.Lat}}</td>
-                <td>{{$bank.Lng}}</td>
+                <th scope="row">{{ $fish.ID }}</th>
+                <td id="fish-name">{{ $fish.Name }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        <a class="btn btn-primary" href="/banks/{{ $bank.ID }}">Просмотреть</a>
-                        <button type="button" class="btn btn-danger" data-url="/banks/{{ $bank.ID }}/delete"
-                            data-bs-toggle="modal" data-bs-target="#delete-bank-modal">Удалить</button>
+                        <button type="button" class="btn btn-danger" data-url="/fishes/{{ $fish.ID }}/delete"
+                            data-bs-toggle="modal" data-bs-target="#delete-fish-modal">Удалить</button>
                     </div>
                 </td>
             </tr>
@@ -30,18 +25,18 @@
         </tbody>
         </thead>
     </table>
-    <a class="btn btn-primary" href="/banks/create">Создать банку</a>
+    <a class="btn btn-primary" href="/fishes/create">Создать сорт рыбы</a>
 </div>
 
-<div class="modal fade" id="delete-bank-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="delete-fish-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-center">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Удаление морской банки</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Удаление сорта рыбы</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Вы точно хотите удалить банку <span id="bank_name_modal"></span>?
+                Вы точно хотите удалить сорт рыбы <span id="fish_name_modal"></span>?
                 <form action="" method="post" id="modal-form">
                     <input id="delete-btn" type="submit" class="d-none">
                 </form>
