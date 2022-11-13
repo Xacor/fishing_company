@@ -1,0 +1,13 @@
+{{define "boat"}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <ul class="list-group">
+        <li class="list-group-item">{{.boat.Name}}</li>
+        <li class="list-group-item">{{.boat.BtypeID}}</li>
+        <li class="list-group-item">{{.boat.Displacement}}</li>
+        <li class="list-group-item">{{.boat.Build_date.Format "2006-01-02"}}</li>
+    </ul>
+</div>
+{{template "footer" -}}
+{{end}}
