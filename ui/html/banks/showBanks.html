@@ -8,20 +8,21 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Название</th>
-                <th scope="col">Ширина</th>
+                <th scope="col">Широта</th>
                 <th scope="col">Долгота</th>
             </tr>
         <tbody>
             {{range $index, $bank := .Banks}}
             <tr>
                 <th scope="row">{{ $bank.ID }}</th>
-                <td>{{$bank.Name}}</td>
+                <td id="bank-name">{{$bank.Name}}</td>
                 <td>{{$bank.Lat}}</td>
                 <td>{{$bank.Lng}}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <a class="btn btn-primary" href="/banks/{{ $bank.ID }}">Просмотреть</a>
-                        <a class="btn btn-danger" href="/banks/{{ $bank.ID }}/delete">Удалить</a>
+                        <button type="button" class="btn btn-danger" data-url="/banks/{{ $bank.ID }}/delete"
+                            data-bs-toggle="modal" data-bs-target="#delete-bank-modal">Удалить</button>
                     </div>
                 </td>
             </tr>
@@ -29,6 +30,28 @@
         </tbody>
         </thead>
     </table>
+    <a class="btn btn-primary" href="/banks/create">Создать банку</a>
+</div>
+
+<div class="modal fade" id="delete-bank-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Удаление морской банки</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы точно хотите удалить банку <span id="bank_name_modal"></span>?
+                <form action="" method="post" id="modal-form">
+                    <input id="delete-btn" type="submit" class="d-none">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <label for="delete-btn" class="btn btn-danger">Да</label>
+            </div>
+        </div>
+    </div>
 </div>
 {{template "footer" -}}
 {{end}}

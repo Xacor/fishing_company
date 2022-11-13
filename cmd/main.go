@@ -41,6 +41,7 @@ func main() {
 	router.Use(gin.Recovery())
 	routes.RegisterRoutes(&router.RouterGroup)
 	router.LoadHTMLGlob("ui/html/*/*.html")
+	router.Static("/static", "./ui/static")
 	//router.LoadHTMLGlob("ui/html/**/*")
 
 	db.Init(conf.DBUrl)
