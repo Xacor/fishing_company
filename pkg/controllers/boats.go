@@ -14,7 +14,7 @@ import (
 )
 
 func BoatForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "create_boat.html", gin.H{})
+	c.HTML(http.StatusOK, "createBoat", gin.H{})
 }
 
 func CreateBoat(c *gin.Context) {
@@ -54,7 +54,7 @@ func DeleteBoatForm(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "delete_boat.html", gin.H{
+	c.HTML(http.StatusOK, "deleteBoat", gin.H{
 		"boatID":   boatID,
 		"boatName": boat.Name,
 	})
@@ -94,7 +94,7 @@ func GetBoat(c *gin.Context) {
 
 		return
 	}
-	c.HTML(http.StatusOK, "show_boat.html", gin.H{
+	c.HTML(http.StatusOK, "boat", gin.H{
 		"boat": boat,
 	})
 }
@@ -128,7 +128,7 @@ func UpdateBoatForm(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "update_boat.html", gin.H{
+	c.HTML(http.StatusOK, "updateBoat", gin.H{
 		"boat": boat,
 	})
 }
