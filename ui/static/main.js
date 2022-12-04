@@ -30,6 +30,14 @@ function DeleteFishModal(event) {
     fishNameElement.innerHTML = event.relatedTarget.closest('tr').querySelector('#fish-name').textContent;
 }
 
+function DeleteEmployeeModal(event) {
+    let form = this.querySelector('form');
+    form.action = event.relatedTarget.dataset.url;
+
+    let fishNameElement = document.getElementById('employee_name_modal');
+    fishNameElement.innerHTML = event.relatedTarget.closest('tr').querySelector('#employee-name').textContent;
+}
+
 window.onload = function() {
     console.log("aaaaaaaa");
     var modalBoat = document.getElementById('delete-boat-modal')
@@ -48,5 +56,10 @@ window.onload = function() {
         modalFish.addEventListener('show.bs.modal', DeleteFishModal)
     }
     
+    var modalEmployee = document.getElementById('delete-employee-modal')
+    if (modalEmployee != null) {
+        modalEmployee.addEventListener('show.bs.modal', DeleteEmployeeModal)
+    }
+
     
 }

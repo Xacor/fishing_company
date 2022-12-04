@@ -1,0 +1,22 @@
+{{define "updateBoat"}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+        <form method="POST" action="/boats/{{ .boat.ID }}/update" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="name" class="form-label">Название</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{.boat.Name}}">
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Тип</label>
+                <input type="number" class="form-control" id="type" name="type" value="{{.boat.BtypeID}}">
+            </div>
+            <div class="mb-3">
+                <label for="displacement" class="form-label">Водоизмещение</label>
+                <input type="number" class="form-control" id="displacement" name="displacement" value="{{.boat.Displacement}}">
+            </div>
+            <input type="submit" class="btn btn-primary" value="Обновить">
+        </form>
+</div>
+{{template "footer" -}}
+{{end}}
