@@ -29,7 +29,8 @@
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         Банки
                     </a>
                     <ul class="dropdown-menu">
@@ -38,7 +39,8 @@
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         Сорта рыбы
                     </a>
                     <ul class="dropdown-menu">
@@ -47,7 +49,23 @@
                     </ul>
                 </li>
             </ul>
+            {{if .user}}
+            <ul class="navbar-nav justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">{{.user}}</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/auth/logout">Выйти</a>
+                </li>
+            </ul>
+            {{else}}
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">Вход</a>
+                    </li>
+                </ul>
+            {{end}}
         </div>
-    </div>
 </nav>
 {{end}}

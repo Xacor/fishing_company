@@ -1,12 +1,15 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/casbin/casbin/v2"
+	"github.com/gin-gonic/gin"
+)
 
-func RegisterRoutes(superRoute *gin.RouterGroup) {
-	boatRoutes(superRoute)
-	authRoutes(superRoute)
+func RegisterRoutes(superRoute *gin.RouterGroup, enforcer *casbin.Enforcer) {
+	boatRoutes(superRoute, enforcer)
+	authRoutes(superRoute, enforcer)
 	indexRoutes(superRoute)
-	bankRoutes(superRoute)
-	fishRoutes(superRoute)
-	employeeRoutes(superRoute)
+	bankRoutes(superRoute, enforcer)
+	fishRoutes(superRoute, enforcer)
+	employeeRoutes(superRoute, enforcer)
 }

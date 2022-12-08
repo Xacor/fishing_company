@@ -2,17 +2,16 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
+	"fishing_company/pkg/utils"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
-
-const tokenkey = "session_token"
 
 type Credentials struct {
 	Username string `form:"username"`
@@ -20,153 +19,133 @@ type Credentials struct {
 }
 
 type RegisterCred struct {
-	Username string `form:"username"`
-	Pwd      string `form:"password"`
-	ConfPwd  string `form:"conf-password"`
+	Username     string `form:"username"`
+	Password     string `form:"password"`
+	ConfPassword string `form:"conf-password"`
+	Role         int    `form:"role"`
 }
 
 func LoginForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	if user != nil {
+		c.HTML(http.StatusBadRequest, "login.html",
+			gin.H{
+				"content": "Please logout first",
+				"user":    user,
+			})
+		return
+	}
+	log.Printf("%+v", user)
+	c.HTML(http.StatusOK, "login.html", gin.H{
+		"user": user,
+	})
 }
 
-// Session data stored in memory, but session token stored in clients cookies
 func Login(c *gin.Context) {
-	var creds Credentials
-
 	session := sessions.Default(c)
-	err := c.ShouldBind(&creds)
-	if err != nil {
-		// render some html
-
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err)
-		}
-	}
-
-	var user models.User
-	result := db.DB.Where("name = ?", creds.Username).First(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "invalid credentials"})
+	sessionUser := session.Get(globals.Userkey)
+	if sessionUser != nil {
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"content": "Please logout first"})
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "invalid credentials, password dont match"})
+	var creds Credentials
+	if err := c.ShouldBind(&creds); err != nil {
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"content": "Form data is not valid"})
 		return
 	}
 
-	sessionToken := uuid.NewString()
-	session.Set(sessionToken, creds.Username)
-
-	err = session.Save()
-	if err != nil {
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err)
-		}
+	if utils.EmptyUserPass(creds.Username, creds.Password) {
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"content": "Parameters can't be empty"})
+		return
 	}
 
-	c.SetCookie(tokenkey, sessionToken, 3600, "/", "localhost", false, false)
+	user, err := utils.CheckUserPass(creds.Username, creds.Password)
+	if err != nil {
+		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"content": "Invalid credentials"})
+		return
+	}
+	log.Println(user.Role.Name)
+	session.Set(globals.Userkey, user.Name)
+	session.Set(globals.Rolekey, user.Role.Name)
 
-	//replace with render some html
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
+	log.Println("User role: ", session.Get(globals.Rolekey))
+
+	if err := session.Save(); err != nil {
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"content": "Failed to save session"})
+		return
+	}
+
+	c.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func Logout(c *gin.Context) {
 	session := sessions.Default(c)
-	session.Clear()
-	if err := session.Save(); err != nil {
-		//change it
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+	user := session.Get(globals.Userkey)
+
+	log.Println("logging out user:", user)
+	if user == nil {
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"content": "User not found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
-}
 
-func AuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		token, err := c.Cookie(tokenkey)
-		if err != nil {
-			if err1 := c.Error(err); err1 != nil {
-				log.Println(err1)
-			}
-		}
-
-		user := session.Get(token)
-		if user == nil {
-			// render html or flash message???
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authorized"})
-			c.Abort()
-		}
+	session.Clear()
+	if err := session.Save(); err != nil {
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"content": "Failed to clear session"})
+		return
 	}
-}
 
-func Profile(c *gin.Context) {
-	session := sessions.Default(c)
-	token, _ := c.Cookie(tokenkey)
-	user := session.Get(token)
-	c.JSON(http.StatusOK, gin.H{"user": user})
-}
-
-// Обновляет время действия токена при каждмом действии пользователя.
-// Возможно надо переделать по таймауту или как то еще
-func TokenTimeoutRefresh() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token, err := c.Cookie(tokenkey)
-		if err != nil {
-			if err1 := c.Error(err); err != nil {
-				log.Println(err1)
-			}
-
-		}
-		c.SetCookie(tokenkey, token, 3600, "/", "localhost", false, false)
-	}
+	c.Redirect(http.StatusMovedPermanently, "/auth/login")
 }
 
 func RegisterForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "register.html", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "register.html", gin.H{"user": user})
 }
 
 func Register(c *gin.Context) {
 	var creds RegisterCred
-	err := c.ShouldBind(&creds)
+	if err := c.ShouldBind(&creds); err != nil {
+		log.Println(err)
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{"content": "Form data is not valid"})
+		return
+	}
+
+	log.Printf("%+v", creds)
+
+	if creds.Password != creds.ConfPassword {
+		log.Println("Passwords not equal")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{"content": "Passwords are not equal"})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 	if err != nil {
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err1)
-		}
+		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"content": "Cannot hash password"})
+		log.Println(err)
+		return
 	}
 
-	if creds.Pwd == creds.ConfPwd {
-		hash, e := bcrypt.GenerateFromPassword([]byte(creds.Pwd), bcrypt.DefaultCost)
-		if e != nil {
-			if err1 := c.Error(e); err1 != nil {
-				log.Println(err1)
-			}
-		}
-
-		newUser := models.User{
-			Name:     creds.Username,
-			Password: string(hash),
-		}
-
-		// проверка на существование пользователя с таким именем
-		// полученная модель опускается, важен только reult
-		result := db.DB.Where(&models.User{Name: newUser.Name}).First(&models.User{})
-		if result.Error == nil {
-			c.JSON(http.StatusOK, gin.H{"error": "user with this name already exist"})
-			return
-		}
-
-		if result = db.DB.Create(&newUser); result.Error != nil {
-			if err1 := c.AbortWithError(http.StatusNotFound, result.Error); err1 != nil {
-				log.Println(err1)
-			}
-			return
-		}
-		c.Redirect(http.StatusMovedPermanently, "/login")
-
-	} else {
-		c.JSON(http.StatusOK, gin.H{"error": "passwords dont match"})
+	// проверка на существование пользователя с таким именем
+	// полученная модель опускается, важен только err
+	if err := db.DB.Where(&models.User{Name: creds.Username}).First(&models.User{}).Error; err == nil {
+		log.Println(err)
+		c.HTML(http.StatusOK, "register.html", gin.H{"content": "User with this name already exists"})
+		return
 	}
+
+	newUser := models.User{
+		Name:     creds.Username,
+		Password: string(hash),
+		RoleID:   creds.Role,
+	}
+	if err := db.DB.Create(&newUser).Error; err != nil {
+		log.Println(err)
+		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"content": "Cannot create user"})
+		return
+	}
+
+	c.Redirect(http.StatusMovedPermanently, "/auth/login")
 }

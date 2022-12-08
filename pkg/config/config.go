@@ -13,6 +13,7 @@ type Config struct {
 	DBUrl   string `mapstructure:"DB_URL"`
 	LogO    string `mapstructure:"LOGGER_TYPE"` //posible values: file, console, all
 	LogFile string `mapstructure:"LOG_FILE"`    //filename with extension
+	Secret  string `mapstructure:"SECRET"`
 }
 
 func LoadConfig() (c Config, err error) {

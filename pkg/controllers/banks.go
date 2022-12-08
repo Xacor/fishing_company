@@ -2,15 +2,19 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
 	"fmt"
 	"net/http"
 	"net/url"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func GetBank(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var bank models.SeaBank
 	id := c.Param("id")
 
@@ -19,10 +23,12 @@ func GetBank(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "bank", gin.H{"Bank": &bank})
+	c.HTML(http.StatusOK, "bank", gin.H{"Bank": &bank, "user": user})
 }
 
 func GetBanks(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var banks []models.SeaBank
 	result := db.DB.Find(&banks)
 	if result.Error != nil {
@@ -32,11 +38,14 @@ func GetBanks(c *gin.Context) {
 	c.HTML(http.StatusOK, "banks", gin.H{
 		"Number": result.RowsAffected,
 		"banks":  &banks,
+		"user":   user,
 	})
 }
 
 func BankForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "bankForm", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "bankForm", gin.H{"user": user})
 }
 
 // нужно добавить валидацию

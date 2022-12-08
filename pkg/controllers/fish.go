@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
 	"net/http"
 	"net/url"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,14 +18,20 @@ func GetFishes(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, result.Error)
 		return
 	}
+
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	c.HTML(http.StatusOK, "fishes", gin.H{
 		"Number": result.RowsAffected,
 		"fishes": &fishes,
+		"user":   user,
 	})
 }
 
 func FishForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "fishForm", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "fishForm", gin.H{"user": user})
 }
 
 func CreateFish(c *gin.Context) {
