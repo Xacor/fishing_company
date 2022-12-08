@@ -16,5 +16,5 @@ func fishRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
 	fishRouter.GET("/", controllers.GetFishes)
 	fishRouter.GET("/create", controllers.FishForm)
 	fishRouter.POST("/create", controllers.CreateFish)
-	fishRouter.DELETE("/:id/delete", controllers.DeleteFish)
+	fishRouter.POST("/:id/delete", controllers.DeleteFish)
 }

@@ -20,5 +20,5 @@ func employeeRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
 	employeeRouter.GET("/:id/update", controllers.UpdateEmployeeForm)
 	employeeRouter.POST("/:id/update", controllers.UpdateEmployee)
 	employeeRouter.GET("/:id/delete", controllers.DeleteEmployeeForm)
-	employeeRouter.DELETE("/:id/delete", controllers.DeleteEmployee)
+	employeeRouter.POST("/:id/delete", controllers.DeleteEmployee)
 }

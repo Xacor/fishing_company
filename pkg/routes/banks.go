@@ -16,5 +16,5 @@ func bankRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
 	bankRouter.GET("/:id", controllers.GetBank)
 	bankRouter.GET("/create", controllers.BankForm)
 	bankRouter.POST("/create", controllers.CreateBank)
-	bankRouter.DELETE("/:id/delete", controllers.DeleteBank)
+	bankRouter.POST("/:id/delete", controllers.DeleteBank)
 }
