@@ -18,6 +18,7 @@ type Employee struct {
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 	Position   Position
+	Trips      []Trip `gorm:"many2many:trips_employees;"`
 }
 
 type Position struct {

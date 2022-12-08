@@ -1,0 +1,12 @@
+{{define "tripForm" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <form method="POST" action="./create" enctype="multipart/form-data">
+       
+
+        <input type="submit" class="btn btn-primary" value="Создать">
+    </form>
+</div>
+{{template "footer" -}}
+{{end}}

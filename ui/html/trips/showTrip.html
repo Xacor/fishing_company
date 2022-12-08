@@ -1,0 +1,15 @@
+{{define "trip" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <ul class="list-group">
+        <li class="list-group-item">{{ .trip.ID }}</li>
+        <li class="list-group-item">{{.trip.Boat.Name}}</li>
+        <li class="list-group-item">{{.trip.Employees}}</li>
+        <li class="list-group-item">{{.trip.FishTypes}}</li>
+        <li class="list-group-item">{{.trip.SeaBanks}}</li>
+        <li class="list-group-item">{{.trip.DepartureDate}}</li>
+    </ul>
+</div>
+{{template "footer" -}}
+{{end}}

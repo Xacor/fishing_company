@@ -9,4 +9,5 @@ func RegisterRoutes(superRoute *gin.RouterGroup) {
 	bankRoutes(superRoute)
 	fishRoutes(superRoute)
 	employeeRoutes(superRoute)
+	tripRoutes(superRoute)
 }

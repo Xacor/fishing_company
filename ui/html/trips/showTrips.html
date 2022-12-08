@@ -1,0 +1,40 @@
+{{define "trips" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <h3>Всего банок: {{.Number}}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Лодка</th>
+                <th scope="col">Команда</th>
+                <th scope="col">Рыба</th>
+                <th scope="col">Банки</th>
+                <th scope="col">Выход в море</th>
+            </tr>
+        <tbody>
+            {{range $index, $trip := .trips}}
+            <tr>
+                <th scope="row">{{ $trip.ID }}</th>
+                <td id="trip-name">{{$trip.Boat.Name}}</td>
+                <td>{{$trip.Employees}}</td>
+                <td>{{$trip.FishTypes}}</td>
+                <td>{{$trip.SeaBanks}}</td>
+                <td>{{$trip.DepartureDate}}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a class="btn btn-primary" href="/trips/{{ $trip.ID }}">Просмотреть</a>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+    <a class="btn btn-primary" href="/trips/create">Новый рейс</a>
+</div>
+
+{{template "footer" -}}
+{{end}}
