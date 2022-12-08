@@ -20,6 +20,5 @@ func boatRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
 	boatRouter.GET("/:id", controllers.GetBoat)
 	boatRouter.GET("/:id/update", controllers.UpdateBoatForm)
 	boatRouter.POST("/:id/update", controllers.UpdateBoat)
-	boatRouter.GET("/:id/delete", controllers.DeleteBoatForm)
 	boatRouter.POST("/:id/delete", controllers.DeleteBoat)
 }

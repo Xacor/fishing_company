@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
 	"fmt"
 	"log"
@@ -10,11 +11,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func EmployeeForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "createEmployee", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "createEmployee", gin.H{"user": user})
 }
 
 func CreateEmployee(c *gin.Context) {
@@ -42,6 +46,8 @@ func CreateEmployee(c *gin.Context) {
 }
 
 func DeleteEmployeeForm(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	employeeID := c.Param("id")
 	var employee models.Employee
 
@@ -56,6 +62,7 @@ func DeleteEmployeeForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "deleteEmployee", gin.H{
 		"employeeID":   employeeID,
 		"employeeName": employee.Lastname + " " + employee.Firstname,
+		"user":         user,
 	})
 }
 
@@ -82,6 +89,8 @@ func DeleteEmployee(c *gin.Context) {
 }
 
 func GetEmployee(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var employee models.Employee
 
 	id := c.Param("id")
@@ -95,10 +104,13 @@ func GetEmployee(c *gin.Context) {
 	}
 	c.HTML(http.StatusOK, "employee", gin.H{
 		"employee": employee,
+		"user":     user,
 	})
 }
 
 func GetEmployees(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var employees []models.Employee
 	result := db.DB.Find(&employees)
 	if result.Error != nil {
@@ -111,10 +123,13 @@ func GetEmployees(c *gin.Context) {
 	c.HTML(http.StatusOK, "employees", gin.H{
 		"Number":    result.RowsAffected,
 		"Employees": &employees,
+		"user":      user,
 	})
 }
 
 func UpdateEmployeeForm(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	employeeId := c.Param("id")
 
 	var employee models.Employee
@@ -129,6 +144,7 @@ func UpdateEmployeeForm(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "updateEmployee", gin.H{
 		"employee": employee,
+		"user":     user,
 	})
 }
 

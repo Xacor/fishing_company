@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
 	"fmt"
 	"log"
@@ -10,11 +11,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func BoatForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "createBoat", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "createBoat", gin.H{"user": user})
 }
 
 func CreateBoat(c *gin.Context) {
@@ -42,24 +46,6 @@ func CreateBoat(c *gin.Context) {
 	c.Redirect(http.StatusMovedPermanently, dest_url.String())
 }
 
-func DeleteBoatForm(c *gin.Context) {
-	boatID := c.Param("id")
-	var boat models.Boat
-
-	if result := db.DB.First(&boat, boatID); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
-		return
-	}
-
-	c.HTML(http.StatusOK, "deleteBoat", gin.H{
-		"boatID":   boatID,
-		"boatName": boat.Name,
-	})
-}
-
 func DeleteBoat(c *gin.Context) {
 	boatID := c.Param("id")
 	if c.PostForm("boatName") != c.PostForm("inputBoatName") {
@@ -83,6 +69,8 @@ func DeleteBoat(c *gin.Context) {
 }
 
 func GetBoat(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var boat models.Boat
 
 	id := c.Param("id")
@@ -96,10 +84,13 @@ func GetBoat(c *gin.Context) {
 	}
 	c.HTML(http.StatusOK, "boat", gin.H{
 		"boat": boat,
+		"user": user,
 	})
 }
 
 func GetBoats(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	var boats []models.Boat
 	result := db.DB.Find(&boats)
 	if result.Error != nil {
@@ -112,10 +103,13 @@ func GetBoats(c *gin.Context) {
 	c.HTML(http.StatusOK, "boats", gin.H{
 		"Number": result.RowsAffected,
 		"Boats":  &boats,
+		"user":   user,
 	})
 }
 
 func UpdateBoatForm(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 	boatId := c.Param("id")
 
 	var boat models.Boat
@@ -130,6 +124,7 @@ func UpdateBoatForm(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "updateBoat", gin.H{
 		"boat": boat,
+		"user": user,
 	})
 }
 
