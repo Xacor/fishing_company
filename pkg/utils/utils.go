@@ -3,8 +3,11 @@ package utils
 import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/models"
+	"log"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -26,4 +29,23 @@ func CheckUserPass(username, password string) (*models.User, error) {
 
 func EmptyUserPass(username, password string) bool {
 	return strings.Trim(username, " ") == "" || strings.Trim(password, " ") == ""
+}
+
+func FlashMessage(c *gin.Context, message string) {
+	session := sessions.Default(c)
+	session.AddFlash(message)
+	if err := session.Save(); err != nil {
+		log.Printf("error in flashMessage saving session: %s", err)
+	}
+}
+
+func Flashes(c *gin.Context) []interface{} {
+	session := sessions.Default(c)
+	flashes := session.Flashes()
+	if len(flashes) != 0 {
+		if err := session.Save(); err != nil {
+			log.Printf("error in flashes saving session: %s", err)
+		}
+	}
+	return flashes
 }

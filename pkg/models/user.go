@@ -16,3 +16,8 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Role      Role
 }
+
+type Role struct {
+	ID   int    `gorm:"primaryKey"`
+	Name string `gorm:"size:16;unique;not null"`
+}

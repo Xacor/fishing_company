@@ -4,3 +4,5 @@ const (
 	Userkey = "user"
 	Rolekey = "role"
 )
+
+const TimeLayout = "2006-01-02"

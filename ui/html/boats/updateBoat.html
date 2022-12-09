@@ -1,6 +1,7 @@
 {{define "updateBoat"}}
 {{template "header" -}}
 {{template "navbar" . -}}
+{{template "alert" .}}
 <div class="container-lg">
         <form method="POST" action="/boats/{{ .boat.ID }}/update" enctype="multipart/form-data">
             <div class="mb-3">
