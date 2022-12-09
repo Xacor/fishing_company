@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fishing_company/pkg/globals"
+	"fishing_company/pkg/utils"
 	"log"
 	"net/http"
 
@@ -13,9 +14,12 @@ import (
 func AuthRequired(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
+
 	if user == nil {
 		log.Println("User not logged in")
-		c.Redirect(http.StatusMovedPermanently, "/auth/login")
+		utils.FlashMessage(c, "Для этого действия необходима аутентификация")
+		session.Save()
+		c.Redirect(http.StatusSeeOther, "/auth/login")
 		c.Abort()
 		return
 	}
@@ -36,8 +40,9 @@ func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 		}
 		if !ok {
 			log.Println("No privs, redirect")
-			c.Redirect(http.StatusMovedPermanently, "/")
-			//add flash messages
+			utils.FlashMessage(c, "У вас недостаточно прав на это действие")
+			session.Save()
+			c.Redirect(http.StatusSeeOther, "/")
 			c.Abort()
 			return
 		}

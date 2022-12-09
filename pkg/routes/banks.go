@@ -12,6 +12,8 @@ func bankRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
 
 	bankRouter := superRoute.Group("/banks")
 	bankRouter.Use(middleware.AuthRequired)
+	bankRouter.Use(middleware.Authorization(e))
+
 	bankRouter.GET("/", controllers.GetBanks)
 	bankRouter.GET("/:id", controllers.GetBank)
 	bankRouter.GET("/create", controllers.BankForm)

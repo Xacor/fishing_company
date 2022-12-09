@@ -1,6 +1,7 @@
 {{define "createEmployee"}}
 {{template "header" -}}
 {{template "navbar" . -}}
+{{template "alert" .}}
 <div class="container-lg">
     <form method="POST" action="./create" enctype="multipart/form-data">
         <div class="mb-3">

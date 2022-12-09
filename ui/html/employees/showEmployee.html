@@ -1,6 +1,7 @@
 {{define "employee"}}
 {{template "header" -}}
 {{template "navbar" . -}}
+{{template "alert" .}}
 <div class="container-lg">
     <ul class="list-group">
         <li class="list-group-item">{{.employee.Lastname}}</li>

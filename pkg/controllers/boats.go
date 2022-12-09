@@ -4,8 +4,8 @@ import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
+	"fishing_company/pkg/utils"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -18,10 +18,17 @@ import (
 func BoatForm(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
-	c.HTML(http.StatusOK, "createBoat", gin.H{"user": user})
+
+	c.HTML(http.StatusOK, "createBoat", gin.H{
+		"user":   user,
+		"alerts": utils.Flashes(c),
+	})
 }
 
 func CreateBoat(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
 	var boat models.Boat
 	boat.Name = c.PostForm("name")
 
@@ -31,94 +38,107 @@ func CreateBoat(c *gin.Context) {
 	displacement, _ := strconv.Atoi(c.PostForm("displacement"))
 	boat.Displacement = uint16(displacement)
 
-	//"2006-01-02" лучше вынести константой
-	date, _ := time.Parse("2006-01-02", c.PostForm("build_date"))
+	date, _ := time.Parse(globals.TimeLayout, c.PostForm("build_date"))
 	boat.Build_date = date
 
-	if result := db.DB.Create(&boat); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
+	if err := db.DB.Where("name = ?", boat.Name).First(&models.Boat{}).Error; err == nil {
+		utils.FlashMessage(c, "Судно с таким именем уже существует или существовало")
+		c.HTML(http.StatusBadRequest, "createBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
 
+	if result := db.DB.Create(&boat); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "boats", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 	dest_url := url.URL{Path: fmt.Sprintf("/boats/%d", boat.ID)}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 }
 
 func DeleteBoat(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
 	boatID := c.Param("id")
-	if c.PostForm("boatName") != c.PostForm("inputBoatName") {
-		c.Redirect(http.StatusMovedPermanently, "/boats")
 
-		return
-	}
-	var boat models.Boat
-	_ = db.DB.First(&boat, boatID)
-	if result := db.DB.Delete(&boat); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Print(err)
-		}
-
+	if result := db.DB.Delete(&models.Boat{}, boatID); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "boats", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
 	dest_url := url.URL{Path: "/boats"}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 
 }
 
 func GetBoat(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
-	var boat models.Boat
 
+	var boat models.Boat
 	id := c.Param("id")
 
 	if result := db.DB.First(&boat, id); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "boat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "boat", gin.H{
-		"boat": boat,
-		"user": user,
+		"boat":   boat,
+		"user":   user,
+		"alerts": utils.Flashes(c),
 	})
 }
 
 func GetBoats(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
+
 	var boats []models.Boat
 	result := db.DB.Find(&boats)
 	if result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "boats", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "boats", gin.H{
 		"Number": result.RowsAffected,
 		"Boats":  &boats,
 		"user":   user,
+		"alerts": utils.Flashes(c),
 	})
 }
 
 func UpdateBoatForm(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
-	boatId := c.Param("id")
 
+	boatId := c.Param("id")
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
@@ -129,16 +149,18 @@ func UpdateBoatForm(c *gin.Context) {
 }
 
 func UpdateBoat(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 
 	boatId := c.Param("id")
-
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
@@ -157,14 +179,15 @@ func UpdateBoat(c *gin.Context) {
 	}
 
 	if result := db.DB.Save(&boat); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotModified, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
 	dest_url := url.URL{Path: fmt.Sprintf("/boats/%d", boat.ID)}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 
 }
