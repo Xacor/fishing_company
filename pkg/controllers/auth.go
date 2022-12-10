@@ -136,10 +136,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// проверка на существование пользователя с таким именем
-	// полученная модель опускается, важен только err
-	if err := db.DB.Where(&models.User{Name: creds.Username}).First(&models.User{}).Error; err == nil {
+	var userExists models.User
+	if err := db.DB.Find(&userExists, "name = ?", creds.Username).Error; err != nil {
 		log.Println(err)
+		utils.FlashMessage(c, "Ошибка при запросе к безе данных")
+		c.HTML(http.StatusOK, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
+	log.Printf("%+v", userExists)
+
+	if userExists.ID != 0 {
 		utils.FlashMessage(c, "Пользователь с таким именем уже существует")
 		c.HTML(http.StatusOK, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -152,7 +158,7 @@ func Register(c *gin.Context) {
 	}
 	if err := db.DB.Create(&newUser).Error; err != nil {
 		log.Println(err)
-		utils.FlashMessage(c, "Cannot create user")
+		utils.FlashMessage(c, "Ошибка при запросе к безе данных")
 		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
