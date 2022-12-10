@@ -19,9 +19,20 @@ func EmployeeForm(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
 
+	var employeePositions []models.Position
+	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "createEmployee", gin.H{
-		"user":   user,
-		"alerts": utils.Flashes(c),
+		"user":              user,
+		"alerts":            utils.Flashes(c),
+		"employeePositions": employeePositions,
 	})
 }
 
@@ -44,12 +55,13 @@ func CreateEmployee(c *gin.Context) {
 
 	if result := db.DB.Create(&employee); result.Error != nil {
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
-		c.HTML(http.StatusInternalServerError, "bankForm", gin.H{
+		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
 			"user":   user,
 			"alerts": utils.Flashes(c),
 		})
 		return
 	}
+
 	dest_url := url.URL{Path: fmt.Sprintf("/employees/%d", employee.ID)}
 	c.Redirect(http.StatusSeeOther, dest_url.String())
 }
@@ -133,9 +145,20 @@ func UpdateEmployeeForm(c *gin.Context) {
 		return
 	}
 
+	var employeePositions []models.Position
+	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "updateEmployee", gin.H{
-		"employee": employee,
-		"user":     user,
+		"employee":          employee,
+		"user":              user,
+		"employeePositions": employeePositions,
 	})
 }
 
