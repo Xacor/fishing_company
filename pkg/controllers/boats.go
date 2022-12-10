@@ -19,9 +19,21 @@ func BoatForm(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
 
+	var boatTypes []models.Btype
+
+	if err := db.DB.Find(&boatTypes).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "createBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "createBoat", gin.H{
-		"user":   user,
-		"alerts": utils.Flashes(c),
+		"user":      user,
+		"alerts":    utils.Flashes(c),
+		"boatTypes": boatTypes,
 	})
 }
 
@@ -133,6 +145,17 @@ func UpdateBoatForm(c *gin.Context) {
 	boatId := c.Param("id")
 	var boat models.Boat
 
+	var boatTypes []models.Btype
+
+	if err := db.DB.Find(&boatTypes).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
@@ -143,8 +166,9 @@ func UpdateBoatForm(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "updateBoat", gin.H{
-		"boat": boat,
-		"user": user,
+		"boat":      boat,
+		"user":      user,
+		"boatTypes": boatTypes,
 	})
 }
 

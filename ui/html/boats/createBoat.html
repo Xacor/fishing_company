@@ -2,27 +2,37 @@
 {{template "header" -}}
 {{template "navbar" . -}}
 {{template "alert" .}}
-<div class="container-lg">
-    <form method="POST" action="./create" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="name" class="form-label">Название</label>
-            <input type="text" class="form-control" id="name" name="name">
+<div class="container-lg py-5">
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <form method="POST" action="./create" enctype="multipart/form-data">
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="name" name="name" required>
+                    <label for="name" class="form-label">Название</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <select class="form-select" id="type" name="type" aria-label="Floating label select example"
+                        required>
+                        {{range .boatTypes}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                    <label for="type">Тип судна</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="number" class="form-control" id="displacement" name="displacement" required>
+                    <label for="displacement" class="form-label">Водоизмещение, т</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" id="build_date" name="build_date" required>
+                    <label for="build_date" class="form-label">Дата постройки</label>
+                </div>
+                <div class="d-grid col-4 mx-auto mb-3">
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-            <label for="type" class="form-label">Тип</label>
-            <input type="number" class="form-control" id="type" name="type">
-        </div>
-        <div class="mb-3">
-            <label for="displacement" class="form-label">Водоизмещение</label>
-            <input type="number" class="form-control" id="displacement" name="displacement">
-        </div>
-        <div class="mb-3">
-            <label for="build_date" class="form-label">Дата постройки</label>
-            <input type="date" class="form-control" id="build_date" name="build_date">
-        </div>
-
-        <input type="submit" class="btn btn-primary" value="Создать">
-    </form>
+    </div>
 </div>
 {{template "footer" -}}
 {{end}}
