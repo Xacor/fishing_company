@@ -17,3 +17,8 @@ type Boat struct {
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 	Btype        Btype
 }
+
+type Btype struct {
+	ID   uint8  `gorm:"primaryKey"`
+	Name string `gorm:"size:124"`
+}

@@ -2,22 +2,44 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
+	"fishing_company/pkg/utils"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func EmployeeForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "createEmployee", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
+	var employeePositions []models.Position
+	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "createEmployee", gin.H{
+		"user":              user,
+		"alerts":            utils.Flashes(c),
+		"employeePositions": employeePositions,
+	})
 }
 
 func CreateEmployee(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
 	var employee models.Employee
 
 	employee.Lastname = c.PostForm("lastname")
@@ -25,124 +47,135 @@ func CreateEmployee(c *gin.Context) {
 	employee.Middlename = c.PostForm("middlename")
 	employee.Address = c.PostForm("address")
 
-	date, _ := time.Parse("2006-01-02", c.PostForm("birth_date"))
+	date, _ := time.Parse(globals.TimeLayout, c.PostForm("birth_date"))
 	employee.Birth_date = date
 
 	positionID, _ := strconv.Atoi(c.PostForm("position"))
 	employee.PositionID = uint8(positionID)
 
 	if result := db.DB.Create(&employee); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
+
 	dest_url := url.URL{Path: fmt.Sprintf("/employees/%d", employee.ID)}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
-}
-
-func DeleteEmployeeForm(c *gin.Context) {
-	employeeID := c.Param("id")
-	var employee models.Employee
-
-	if result := db.DB.First(&employee, employeeID); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
-		return
-	}
-
-	c.HTML(http.StatusOK, "deleteEmployee", gin.H{
-		"employeeID":   employeeID,
-		"employeeName": employee.Lastname + " " + employee.Firstname,
-	})
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 }
 
 func DeleteEmployee(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
 	employeeID := c.Param("id")
-	if c.PostForm("employeeName") != c.PostForm("inputEmployeeName") {
-		c.Redirect(http.StatusMovedPermanently, "/employees")
-
-		return
-	}
 	var employee models.Employee
-	_ = db.DB.First(&employee, employeeID)
-	if result := db.DB.Delete(&employee); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Print(err)
-		}
 
+	if result := db.DB.Delete(&employee, employeeID); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "employees", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
 	dest_url := url.URL{Path: "/employees"}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 
 }
 
 func GetEmployee(c *gin.Context) {
-	var employee models.Employee
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 
+	var employee models.Employee
 	id := c.Param("id")
 
 	if result := db.DB.First(&employee, id); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "employee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "employee", gin.H{
 		"employee": employee,
+		"user":     user,
 	})
 }
 
 func GetEmployees(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
 	var employees []models.Employee
 	result := db.DB.Find(&employees)
 	if result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "employees", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "employees", gin.H{
 		"Number":    result.RowsAffected,
 		"Employees": &employees,
+		"user":      user,
 	})
 }
 
 func UpdateEmployeeForm(c *gin.Context) {
-	employeeId := c.Param("id")
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 
+	employeeId := c.Param("id")
 	var employee models.Employee
 
 	if result := db.DB.First(&employee, employeeId); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
 
+	var employeePositions []models.Position
+	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
 	c.HTML(http.StatusOK, "updateEmployee", gin.H{
-		"employee": employee,
+		"employee":          employee,
+		"user":              user,
+		"employeePositions": employeePositions,
 	})
 }
 
 func UpdateEmployee(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
 
 	employeeId := c.Param("id")
 
 	var employee models.Employee
 
 	if result := db.DB.First(&employee, employeeId); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
@@ -159,7 +192,7 @@ func UpdateEmployee(c *gin.Context) {
 		employee.Firstname = address
 	}
 	if c.PostForm("birth_date") != "" {
-		date, _ := time.Parse("2006-01-02", c.PostForm("birth_date"))
+		date, _ := time.Parse(globals.TimeLayout, c.PostForm("birth_date"))
 		employee.Birth_date = date
 	}
 
@@ -169,14 +202,15 @@ func UpdateEmployee(c *gin.Context) {
 	}
 
 	if result := db.DB.Save(&employee); result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotModified, result.Error); err != nil {
-			log.Println(err)
-		}
-
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
 		return
 	}
 
 	dest_url := url.URL{Path: fmt.Sprintf("/employees/%d", employee.ID)}
-	c.Redirect(http.StatusMovedPermanently, dest_url.String())
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 
 }

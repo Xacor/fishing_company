@@ -1,7 +1,8 @@
 {{define "boat"}}
 {{template "header" -}}
 {{template "navbar" . -}}
-<div class="container-lg">
+{{template "alert" .}}
+<div class="container-lg py-5">
     <ul class="list-group">
         <li class="list-group-item">{{.boat.Name}}</li>
         <li class="list-group-item">{{.boat.BtypeID}}</li>

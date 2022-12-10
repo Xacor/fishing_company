@@ -1,35 +1,45 @@
 {{define "createEmployee"}}
 {{template "header" -}}
 {{template "navbar" . -}}
-<div class="container-lg">
-    <form method="POST" action="./create" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="lastname" class="form-label">Фамилия</label>
-            <input type="text" class="form-control" id="lastname" name="lastname" required>
+{{template "alert" .}}
+<div class="container-lg py-5">
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <form method="POST" action="./create" enctype="multipart/form-data">
+                <div class="mb-3 form-floating">                   
+                    <input type="text" class="form-control" id="lastname" name="lastname" required>
+                    <label for="lastname" class="form-label">Фамилия</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="firstname" name="firstname" required>
+                    <label for="firstname" class="form-label">Имя</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="middlename" name="middlename">
+                    <label for="middlename" class="form-label">Отчество</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="address" name="address" required>
+                    <label for="address" class="form-label">Адрес</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+                    <label for="birth_date" class="form-label">Дата рождения</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <select class="form-select" id="position" name="position" aria-label="Floating label select example" required>
+                        {{range .employeePositions}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                    <label for="position" class="form-label">Должность</label>
+                </div>
+                <div class="d-grid col-4 mx-auto mb-3">
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-            <label for="firstname" class="form-label">Имя</label>
-            <input type="text" class="form-control" id="firstname" name="firstname" required>
-        </div>
-        <div class="mb-3">
-            <label for="middlename" class="form-label">Отчество</label>
-            <input type="text" class="form-control" id="middlename" name="middlename">
-        </div>
-        <div class="mb-3">
-            <label for="address" class="form-label">Адрес</label>
-            <input type="text" class="form-control" id="address" name="address" required>
-        </div>
-        <div class="mb-3">
-            <label for="birth_date" class="form-label">Дата рождения</label>
-            <input type="date" class="form-control" id="birth_date" name="birth_date" required>
-        </div>
-        <div class="mb-3">
-            <label for="position" class="form-label">Номер должности</label>
-            <input type="number" class="form-control" id="position" name="position" required>
-        </div>
-        
-        <input type="submit" class="btn btn-primary" value="Создать">
-    </form>
+    </div>
 </div>
 {{template "footer" -}}
 {{end}}

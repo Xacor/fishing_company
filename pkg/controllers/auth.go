@@ -2,17 +2,16 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
+	"fishing_company/pkg/utils"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
-
-const tokenkey = "session_token"
 
 type Credentials struct {
 	Username string `form:"username"`
@@ -20,153 +19,143 @@ type Credentials struct {
 }
 
 type RegisterCred struct {
-	Username string `form:"username"`
-	Pwd      string `form:"password"`
-	ConfPwd  string `form:"conf-password"`
+	Username     string `form:"username"`
+	Password     string `form:"password"`
+	ConfPassword string `form:"conf-password"`
+	Role         int    `form:"role"`
 }
 
 func LoginForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	if user != nil {
+		utils.FlashMessage(c, "Сначала необходимо выйти")
+		c.HTML(http.StatusBadRequest, "login.html",
+			gin.H{
+				"alerts": utils.Flashes(c),
+				"user":   user,
+			})
+		return
+	}
+
+	c.HTML(http.StatusOK, "login.html", gin.H{
+		"user":   user,
+		"alerts": utils.Flashes(c),
+	})
 }
 
-// Session data stored in memory, but session token stored in clients cookies
 func Login(c *gin.Context) {
-	var creds Credentials
-
 	session := sessions.Default(c)
-	err := c.ShouldBind(&creds)
-	if err != nil {
-		// render some html
-
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err)
-		}
-	}
-
-	var user models.User
-	result := db.DB.Where("name = ?", creds.Username).First(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "invalid credentials"})
+	sessionUser := session.Get(globals.Userkey)
+	if sessionUser != nil {
+		utils.FlashMessage(c, "Сначала необходимо выйти")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "invalid credentials, password dont match"})
+	var creds Credentials
+	if err := c.ShouldBind(&creds); err != nil {
+		utils.FlashMessage(c, "Даные формы некорректны")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
 
-	sessionToken := uuid.NewString()
-	session.Set(sessionToken, creds.Username)
-
-	err = session.Save()
-	if err != nil {
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err)
-		}
+	if utils.EmptyUserPass(creds.Username, creds.Password) {
+		utils.FlashMessage(c, "Поля не могут быть пустыми")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{"alerts": utils.Flashes(c)})
+		return
 	}
 
-	c.SetCookie(tokenkey, sessionToken, 3600, "/", "localhost", false, false)
+	user, err := utils.CheckUserPass(creds.Username, creds.Password)
+	if err != nil {
+		utils.FlashMessage(c, "Введены неверные учтеные данные")
+		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
 
-	//replace with render some html
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
+	session.Set(globals.Userkey, user.Name)
+	session.Set(globals.Rolekey, user.Role.Name)
+
+	if err := session.Save(); err != nil {
+		utils.FlashMessage(c, "Ошибка во время сохранения сессии")
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 func Logout(c *gin.Context) {
 	session := sessions.Default(c)
-	session.Clear()
-	if err := session.Save(); err != nil {
-		//change it
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+	user := session.Get(globals.Userkey)
+
+	log.Println("logging out user:", user)
+	if user == nil {
+		utils.FlashMessage(c, "Пользователь не найден")
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
-}
 
-func AuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		token, err := c.Cookie(tokenkey)
-		if err != nil {
-			if err1 := c.Error(err); err1 != nil {
-				log.Println(err1)
-			}
-		}
-
-		user := session.Get(token)
-		if user == nil {
-			// render html or flash message???
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authorized"})
-			c.Abort()
-		}
+	session.Clear()
+	if err := session.Save(); err != nil {
+		utils.FlashMessage(c, "Ошибка во время удаления сессии")
+		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
+		return
 	}
-}
 
-func Profile(c *gin.Context) {
-	session := sessions.Default(c)
-	token, _ := c.Cookie(tokenkey)
-	user := session.Get(token)
-	c.JSON(http.StatusOK, gin.H{"user": user})
-}
-
-// Обновляет время действия токена при каждмом действии пользователя.
-// Возможно надо переделать по таймауту или как то еще
-func TokenTimeoutRefresh() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token, err := c.Cookie(tokenkey)
-		if err != nil {
-			if err1 := c.Error(err); err != nil {
-				log.Println(err1)
-			}
-
-		}
-		c.SetCookie(tokenkey, token, 3600, "/", "localhost", false, false)
-	}
+	c.Redirect(http.StatusSeeOther, "/auth/login")
 }
 
 func RegisterForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "register.html", gin.H{})
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+	c.HTML(http.StatusOK, "register.html", gin.H{"user": user, "alerts": utils.Flashes(c)})
 }
 
 func Register(c *gin.Context) {
 	var creds RegisterCred
-	err := c.ShouldBind(&creds)
+
+	if err := c.ShouldBind(&creds); err != nil {
+		log.Println(err)
+		utils.FlashMessage(c, "Неверные данные формы")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
+
+	if creds.Password != creds.ConfPassword {
+		utils.FlashMessage(c, "Введеные пароли не совпадают")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 	if err != nil {
-		if err1 := c.Error(err); err1 != nil {
-			log.Println(err1)
-		}
+		utils.FlashMessage(c, "Ошибка сервера")
+		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		log.Println(err)
+		return
 	}
 
-	if creds.Pwd == creds.ConfPwd {
-		hash, e := bcrypt.GenerateFromPassword([]byte(creds.Pwd), bcrypt.DefaultCost)
-		if e != nil {
-			if err1 := c.Error(e); err1 != nil {
-				log.Println(err1)
-			}
-		}
-
-		newUser := models.User{
-			Name:     creds.Username,
-			Password: string(hash),
-		}
-
-		// проверка на существование пользователя с таким именем
-		// полученная модель опускается, важен только reult
-		result := db.DB.Where(&models.User{Name: newUser.Name}).First(&models.User{})
-		if result.Error == nil {
-			c.JSON(http.StatusOK, gin.H{"error": "user with this name already exist"})
-			return
-		}
-
-		if result = db.DB.Create(&newUser); result.Error != nil {
-			if err1 := c.AbortWithError(http.StatusNotFound, result.Error); err1 != nil {
-				log.Println(err1)
-			}
-			return
-		}
-		c.Redirect(http.StatusMovedPermanently, "/login")
-
-	} else {
-		c.JSON(http.StatusOK, gin.H{"error": "passwords dont match"})
+	// проверка на существование пользователя с таким именем
+	// полученная модель опускается, важен только err
+	if err := db.DB.Where(&models.User{Name: creds.Username}).First(&models.User{}).Error; err == nil {
+		log.Println(err)
+		utils.FlashMessage(c, "Пользователь с таким именем уже существует")
+		c.HTML(http.StatusOK, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		return
 	}
+
+	newUser := models.User{
+		Name:     creds.Username,
+		Password: string(hash),
+		RoleID:   creds.Role,
+	}
+	if err := db.DB.Create(&newUser).Error; err != nil {
+		log.Println(err)
+		utils.FlashMessage(c, "Cannot create user")
+		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/auth/login")
 }
