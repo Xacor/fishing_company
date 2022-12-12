@@ -1,14 +1,26 @@
 {{define "trip" -}}
 {{template "header" -}}
 {{template "navbar" . -}}
+<h3>Сведения о рейсе №{{ .Trip.ID }} </h3>
 <div class="container-lg">
     <ul class="list-group">
-        <li class="list-group-item">{{ .trip.ID }}</li>
-        <li class="list-group-item">{{.trip.Boat.Name}}</li>
-        <li class="list-group-item">{{.trip.Employees}}</li>
-        <li class="list-group-item">{{.trip.FishTypes}}</li>
-        <li class="list-group-item">{{.trip.SeaBanks}}</li>
-        <li class="list-group-item">{{.trip.DepartureDate}}</li>
+        <li class="list-group-item">Название судна: {{.Trip.Boat.Name}}</li>
+        <li class="list-group-item">Дата выхода в море: {{.Trip.DepartureDate.Format "02 January 2006"}}</li>
+        <li class="list-group-item">Дата возвращения:
+            {{ if eq .Trip.ArrivalDate.String "2006-01-02 00:00:00 +0300 MSK"}}
+                В рейсе...   
+            {{else}}
+                {{ .Trip.ArrivalDate.Format "02 January 2006" }}
+            {{end}}
+        </li>
+    </ul>
+</div>
+<h3>Команда</h2>
+<div class="container-lg">
+    <ul class="list-group">
+        {{range $ind, $emp := .Trip.Employees}}
+            <li class="list-group-item">{{ $emp.Lastname }} {{ $emp.Firstname }} {{if len $emp.Middlename}}{{$emp.Middlename}}{{end}}</li>
+        {{end}}
     </ul>
 </div>
 {{template "footer" -}}

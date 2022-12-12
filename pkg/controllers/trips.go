@@ -120,8 +120,7 @@ func TripForm(c *gin.Context) {
 func convertStrSliceToIntSlice(slc []string) []int {
 	l := len(slc)
 	if l != 0 {
-		//что-то в создании слайса
-		slice := make([]int, l, l)
+		slice := make([]int, l)
 		for i, id := range slc {
 			v, _ := strconv.Atoi(id)
 			slice[i] = int(v)
@@ -205,11 +204,11 @@ func GetTrips(c *gin.Context) {
 func GetTrip(c *gin.Context) {
 	var trip models.Trip
 	id := c.Param("id")
-
-	if result := db.DB.First(&trip, id); result.Error != nil {
+	result := db.DB.Preload("Boat").Preload("Employees").Preload("FishTypes").Preload("SeaBanks").First(&trip, id)
+	if result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
 
-	c.HTML(http.StatusOK, "trip", gin.H{"Bank": &trip})
+	c.HTML(http.StatusOK, "trip", gin.H{"Trip": &trip})
 }
