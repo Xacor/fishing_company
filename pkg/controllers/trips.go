@@ -13,12 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getBoatsID(c *gin.Context) []int {
-	type BoatID struct {
-		BoatID int
-	}
-	var bIDs []BoatID
-	result := db.DB.Model(&models.Trip{}).Where("arrival_date = ?", "2006-01-02").Find(&bIDs)
+func getFreeBoats(c *gin.Context) []models.Boat {
+	var bIDs []int
+	var boats []models.Boat
+	// select boat_id from trips where arrival_date = '2006-01-02';
+	result := db.DB.Model(&models.Trip{}).Select("boat_id").Where("arrival_date = ?", "2006-01-02").Find(&bIDs)
 	if result.Error != nil {
 		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
 			log.Println(err)
@@ -26,27 +25,28 @@ func getBoatsID(c *gin.Context) []int {
 
 		return nil
 	}
-	listID := make([]int, 0, len(bIDs))
-	for i, id := range bIDs {
-		listID[i] = id.BoatID
-	}
-	log.Println(listID)
 
-	return listID
+	result = db.DB.Not(bIDs).Find(&boats)
+	if result.Error != nil {
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
+		return nil
+	}
+	return boats
+
 }
 
-func getEmployeesID(c *gin.Context) []int {
+func getFreeEmployees(c *gin.Context) []models.Employee {
 	type TripsEmployees struct {
 		TripID     int
 		EmployeeID int
 	}
-
-	var emps []models.Employee
-	// result := db.DB.Model(&models.Employee{}).Preload("Trips").Where("arrival_date = ?", "2006-01-02").Find(&emps)
-	// SELECT * FROM `employees` WHERE arrival_date = '2006-01-02' AND `employees`.`deleted_at` IS NULL
-
-	// db.DB.Model(&TripsEmployees{}).Select("employee_id").Joins("inner join trips on trip_id = trips.id").Where("trips.arrival_date = ?", "2006-01-02").Scan(&res)
-	result := db.DB.Model(&TripsEmployees{}).Select("employee_id").Joins("inner join trips on trip_id = trips.id").Where("trips.arrival_date = ?", "2006-01-02").Find(&emps)
+	var empIDs []int
+	var employees []models.Employee
+	//select employee_id from trips_employees inner join trips on trip_id = trips.id where trips.arrival_date = '2006-01-02';
+	result := db.DB.Model(&TripsEmployees{}).Select("employee_id").Joins("inner join trips on trip_id = trips.id").Where("trips.arrival_date = ?", "2006-01-02").Find(&empIDs)
 	if result.Error != nil {
 		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
 			log.Println(err)
@@ -54,11 +54,17 @@ func getEmployeesID(c *gin.Context) []int {
 
 		return nil
 	}
-	listID := make([]int, 0, len(emps))
-	for i, emp := range emps {
-		listID[i] = emp.ID
+
+	result = db.DB.Not(empIDs).Find(&employees)
+	if result.Error != nil {
+		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
+			log.Println(err)
+		}
+
+		return nil
 	}
-	return listID
+
+	return employees
 }
 
 func getEmployees(c *gin.Context, trip *models.Trip, empIntIDs []int) {
@@ -96,26 +102,9 @@ func TripForm(c *gin.Context) {
 	var boats []models.Boat
 	var employees []models.Employee
 
-	listID := getBoatsID(c)
-	result := db.DB.Not(listID).Find(&boats)
+	boats = getFreeBoats(c)
 
-	if result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
-		return
-	}
-
-	listID = getEmployeesID(c)
-	result = db.DB.Not(listID).Find(&employees)
-	if result.Error != nil {
-		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
-			log.Println(err)
-		}
-
-		return
-	}
+	employees = getFreeEmployees(c)
 
 	sbs := getFormSeaBanks(c)
 	fts := getFormFishTypes(c)
@@ -128,12 +117,14 @@ func TripForm(c *gin.Context) {
 	})
 }
 
-// какая-то ошибка здесь вылезает
 func convertStrSliceToIntSlice(slc []string) []int {
-	if len(slc) != 0 {
-		slice := make([]int, 0, len(slc))
+	l := len(slc)
+	if l != 0 {
+		//что-то в создании слайса
+		slice := make([]int, l, l)
 		for i, id := range slc {
-			slice[i], _ = strconv.Atoi(id)
+			v, _ := strconv.Atoi(id)
+			slice[i] = int(v)
 		}
 		return slice
 	}
@@ -174,8 +165,8 @@ func CreateTrip(c *gin.Context) {
 
 	empStrIDs := c.PostFormArray("employees")
 	log.Println(empStrIDs)
-	// emps := convertStrSliceToIntSlice(empStrIDs)
-	// getEmployees(c, &trip, emps)
+	emps := convertStrSliceToIntSlice(empStrIDs)
+	getEmployees(c, &trip, emps)
 
 	sbsStr := c.PostFormArray("seabanks")
 	log.Println(sbsStr)
@@ -200,7 +191,7 @@ func CreateTrip(c *gin.Context) {
 
 func GetTrips(c *gin.Context) {
 	var trips []models.Trip
-	result := db.DB.Find(&trips)
+	result := db.DB.Preload("Boat").Preload("Employees").Preload("FishTypes").Preload("SeaBanks").Find(&trips)
 	if result.Error != nil {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
