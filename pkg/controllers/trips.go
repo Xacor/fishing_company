@@ -232,15 +232,6 @@ func EndTripForm(c *gin.Context) {
 		return
 	}
 
-	// if err := db.DB.Find().Error; err != nil {
-	// 	utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
-	// 	c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
-	// 		"user":   user,
-	// 		"alerts": utils.Flashes(c),
-	// 	})
-	// 	return
-	// }
-
 	c.HTML(http.StatusOK, "endTrip", gin.H{
 		"trip": trip,
 		"user": user,
