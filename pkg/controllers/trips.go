@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/globals"
 	"fishing_company/pkg/models"
+	"fishing_company/pkg/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -211,4 +214,76 @@ func GetTrip(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "trip", gin.H{"Trip": &trip})
+}
+
+func EndTripForm(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
+	tripId := c.Param("id")
+	var trip models.Trip
+
+	if result := db.DB.Preload("FishTypes").Find(&trip, tripId); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "endTrip", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+
+	// if err := db.DB.Find().Error; err != nil {
+	// 	utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+	// 	c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
+	// 		"user":   user,
+	// 		"alerts": utils.Flashes(c),
+	// 	})
+	// 	return
+	// }
+
+	c.HTML(http.StatusOK, "endTrip", gin.H{
+		"trip": trip,
+		"user": user,
+	})
+}
+
+func EndTrip(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(globals.Userkey)
+
+	strID := c.Param("id")
+	tripID, _ := strconv.Atoi(strID)
+	var ftIDs []int
+	if result := db.DB.Model(&models.FishType{}).Select("id").Find(&ftIDs); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "endTrip", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+	}
+	for _, ftID := range ftIDs {
+		catch, err := strconv.Atoi(c.PostForm(strconv.Itoa(ftID)))
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println("Catch", catch)
+		if result := db.DB.Model(&models.FishTypeTrip{}).Where("trip_id = ? and fish_type_id = ?", tripID, ftID).Updates(&models.FishTypeTrip{Catch: catch}); result.Error != nil {
+			utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+			c.HTML(http.StatusInternalServerError, "endTrip", gin.H{
+				"user":   user,
+				"alerts": utils.Flashes(c),
+			})
+			return
+		}
+	}
+	if result := db.DB.Model(&models.Trip{}).Where("id = ?", tripID).Updates(&models.Trip{ArrivalDate: time.Now()}); result.Error != nil {
+		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
+		c.HTML(http.StatusInternalServerError, "endTrip", gin.H{
+			"user":   user,
+			"alerts": utils.Flashes(c),
+		})
+		return
+	}
+	dest_url := url.URL{Path: fmt.Sprintf("/trips")}
+	c.Redirect(http.StatusSeeOther, dest_url.String())
 }

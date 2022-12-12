@@ -15,12 +15,18 @@
         </li>
     </ul>
 </div>
-<h3>Команда</h2>
+<h3>Команда</h3>
 <div class="container-lg">
     <ul class="list-group">
         {{range $ind, $emp := .Trip.Employees}}
             <li class="list-group-item">{{ $emp.Lastname }} {{ $emp.Firstname }} {{if len $emp.Middlename}}{{$emp.Middlename}}{{end}}</li>
         {{end}}
+    </ul>
+</div>
+<h3>Улов</h3>
+<div class="container-lg">
+    <ul class="list-group">
+        ХЗ как выводить
     </ul>
 </div>
 {{template "footer" -}}

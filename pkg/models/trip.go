@@ -10,5 +10,11 @@ type Trip struct {
 	Boat          Boat
 	Employees     []Employee `gorm:"many2many:trips_employees;"`
 	SeaBanks      []SeaBank  `gorm:"many2many:sea_banks_trips;"`
-	FishTypes     []FishType `gorm:"many2many:fish_types_trips;"`
+	FishTypes     []FishType `gorm:"many2many:fish_type_trips;"`
+}
+
+type FishTypeTrip struct {
+	FishTypeID int
+	TripID     int
+	Catch      int `gorm:"default:0"`
 }

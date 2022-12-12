@@ -14,5 +14,6 @@ func tripRoutes(superRoute *gin.RouterGroup) {
 	tripRouter.GET("/:id", controllers.GetTrip)
 	tripRouter.GET("/create", controllers.TripForm)
 	tripRouter.POST("/create", controllers.CreateTrip)
-	// tripRouter.POST("/:id/delete", controllers.DeleteBank)
+	tripRouter.GET("/:id/end", controllers.EndTripForm)
+	tripRouter.POST("/:id/end", controllers.EndTrip)
 }

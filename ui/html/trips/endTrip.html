@@ -1,0 +1,25 @@
+{{define "endTrip"}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg py-5">
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <form method="POST" action="/trips/{{ .trip.ID }}/end" enctype="multipart/form-data">
+                <h3>Улов</h3>
+                {{ range $index, $ft := .trip.FishTypes}}
+                    <div class="mb-3 form-floating">
+                        <input type="text" class="form-control" id="{{$ft.ID}}" name="{{$ft.ID}}">
+                        <label for="{{$ft.ID}}" class="form-label">{{$ft.Name}}</label>
+                    </div>
+                {{end}}
+                <div class="d-grid col-4 mx-auto mb-3">
+                    <button type="submit" class="btn btn-primary">Завершить рейс</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{template "footer" -}}
+{{end}}

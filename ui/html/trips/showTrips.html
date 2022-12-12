@@ -39,7 +39,6 @@
                 <td>
                     {{ if eq $trip.ArrivalDate.String "2006-01-02 00:00:00 +0300 MSK"}}
                         В рейсе...
-                       
                     {{else}}
                     {{ $trip.ArrivalDate.Format "02 January 2006" }}
                     {{end}}
@@ -47,6 +46,10 @@
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <a class="btn btn-primary" href="/trips/{{ $trip.ID }}">Просмотреть</a>
+                       
+                        {{ if eq $trip.ArrivalDate.String "2006-01-02 00:00:00 +0300 MSK" }}
+                        <a class="btn btn-secondary" href="/trips/{{ $trip.ID }}/end">Завершить</a>     
+                        {{end}}
                     </div>
                 </td>
             </tr>
@@ -56,6 +59,5 @@
     </table>
     <a class="btn btn-primary" href="/trips/create">Новый рейс</a>
 </div>
-
 {{template "footer" -}}
 {{end}}

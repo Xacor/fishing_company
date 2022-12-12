@@ -40,7 +40,11 @@ func Init(url string) {
 		log.Fatalln(err)
 	}
 
-	if err = db.AutoMigrate(&models.Boat{}, &models.Trip{}, &models.User{}, &models.Employee{}, &models.Position{}, &models.FishType{}, &models.SeaBank{}, &models.Btype{}); err != nil {
+	if err = db.SetupJoinTable(&models.Trip{}, "FishTypes", &models.FishTypeTrip{}); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err = db.AutoMigrate(&models.Boat{}, &models.FishTypeTrip{}, &models.Trip{}, &models.User{}, &models.Employee{}, &models.Position{}, &models.FishType{}, &models.SeaBank{}, &models.Btype{}); err != nil {
 		log.Fatalln(err)
 	}
 	DB = db
