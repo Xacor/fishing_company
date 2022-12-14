@@ -1,0 +1,49 @@
+{{define "createTrip"}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<h2>Новый рейс</h2>
+<div class="container-lg">
+    <form method="POST" action="./create" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="boats">Лодки</label>
+            <select class="form-select" name="boats" id="boats">
+                {{ range $index, $boat :=  .Boats }}
+                    <option value="{{ $boat.ID }}">{{ $boat.Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="employees">Команда</label>
+            <select class="form-select" multiple name="employees" id="employees">
+                {{ range $index, $employee :=  .Employees }}
+                    <option value="{{ $employee.ID }}">
+                        {{if len $employee.Middlename}}
+                            {{$employee.Lastname}} {{$employee.Firstname}} {{$employee.Middlename}}
+                        {{else}}
+                            {{$employee.Lastname}} {{$employee.Firstname}}
+                        {{end}}
+                    </option>
+                {{ end }}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="seabanks">Банки</label>
+            <select class="form-select" name="seabanks" id="seabanks">
+                {{ range $index, $bank :=  .SeaBanks }}
+                    <option value="{{ $bank.ID }}">{{ $bank.Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="fish">Рыба</label>
+            <select class="form-select" multiple name="fish" id="fish">
+                {{ range $index, $type :=  .FishTypes }}
+                    <option value="{{ $type.ID }}">{{ $type.Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Создать">
+    </form>
+</div>
+{{template "footer" -}}
+{{end}}
