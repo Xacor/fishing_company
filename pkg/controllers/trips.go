@@ -16,7 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getFreeBoats(c *gin.Context) []models.Boat {
+func GetFreeBoats(c *gin.Context) []models.Boat {
 	var bIDs []int
 	var boats []models.Boat
 	// select boat_id from trips where arrival_date = '2006-01-02';
@@ -41,7 +41,7 @@ func getFreeBoats(c *gin.Context) []models.Boat {
 
 }
 
-func getFreeEmployees(c *gin.Context) []models.Employee {
+func GetFreeEmployees(c *gin.Context) []models.Employee {
 	type TripsEmployees struct {
 		TripID     int
 		EmployeeID int
@@ -70,7 +70,7 @@ func getFreeEmployees(c *gin.Context) []models.Employee {
 	return employees
 }
 
-func getEmployees(c *gin.Context, trip *models.Trip, empIntIDs []int) {
+func GetEmployeesForTrip(c *gin.Context, trip *models.Trip, empIntIDs []int) {
 	result := db.DB.Find(&trip.Employees, empIntIDs)
 	if result.Error != nil {
 		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
@@ -79,7 +79,7 @@ func getEmployees(c *gin.Context, trip *models.Trip, empIntIDs []int) {
 	}
 }
 
-func getFormSeaBanks(c *gin.Context) []models.SeaBank {
+func GetFormSeaBanks(c *gin.Context) []models.SeaBank {
 	var sbs []models.SeaBank
 	result := db.DB.Find(&sbs)
 	if result.Error != nil {
@@ -90,7 +90,7 @@ func getFormSeaBanks(c *gin.Context) []models.SeaBank {
 	return sbs
 }
 
-func getFormFishTypes(c *gin.Context) []models.FishType {
+func GetFormFishTypes(c *gin.Context) []models.FishType {
 	var fts []models.FishType
 	result := db.DB.Find(&fts)
 	if result.Error != nil {
@@ -105,12 +105,12 @@ func TripForm(c *gin.Context) {
 	var boats []models.Boat
 	var employees []models.Employee
 
-	boats = getFreeBoats(c)
+	boats = GetFreeBoats(c)
 
-	employees = getFreeEmployees(c)
+	employees = GetFreeEmployees(c)
 
-	sbs := getFormSeaBanks(c)
-	fts := getFormFishTypes(c)
+	sbs := GetFormSeaBanks(c)
+	fts := GetFormFishTypes(c)
 
 	c.HTML(http.StatusOK, "createTrip", gin.H{
 		"Boats":     &boats,
@@ -120,7 +120,7 @@ func TripForm(c *gin.Context) {
 	})
 }
 
-func convertStrSliceToIntSlice(slc []string) []int {
+func ConvertStrSliceToIntSlice(slc []string) []int {
 	l := len(slc)
 	if l != 0 {
 		slice := make([]int, l)
@@ -133,7 +133,7 @@ func convertStrSliceToIntSlice(slc []string) []int {
 	return nil
 }
 
-func getSeaBanks(c *gin.Context, trip *models.Trip, ids []int) {
+func GetSeaBanks(c *gin.Context, trip *models.Trip, ids []int) {
 	var sbs []models.SeaBank
 	result := db.DB.Find(&sbs, ids)
 	if result.Error != nil {
@@ -144,7 +144,7 @@ func getSeaBanks(c *gin.Context, trip *models.Trip, ids []int) {
 	trip.SeaBanks = append(trip.SeaBanks, sbs...)
 }
 
-func getFishTypes(c *gin.Context, trip *models.Trip, ids []int) {
+func GetFishTypes(c *gin.Context, trip *models.Trip, ids []int) {
 	var fts []models.FishType
 	result := db.DB.Find(&fts, ids)
 	if result.Error != nil {
@@ -167,18 +167,18 @@ func CreateTrip(c *gin.Context) {
 
 	empStrIDs := c.PostFormArray("employees")
 	log.Println(empStrIDs)
-	emps := convertStrSliceToIntSlice(empStrIDs)
-	getEmployees(c, &trip, emps)
+	emps := ConvertStrSliceToIntSlice(empStrIDs)
+	GetEmployeesForTrip(c, &trip, emps)
 
 	sbsStr := c.PostFormArray("seabanks")
 	log.Println(sbsStr)
-	sbs := convertStrSliceToIntSlice(sbsStr)
-	getSeaBanks(c, &trip, sbs)
+	sbs := ConvertStrSliceToIntSlice(sbsStr)
+	GetSeaBanks(c, &trip, sbs)
 
 	ftsStr := c.PostFormArray("fish")
 	log.Println(ftsStr)
-	fts := convertStrSliceToIntSlice(ftsStr)
-	getFishTypes(c, &trip, fts)
+	fts := ConvertStrSliceToIntSlice(ftsStr)
+	GetFishTypes(c, &trip, fts)
 
 	if result := db.DB.Create(&trip); result.Error != nil {
 		if err := c.AbortWithError(http.StatusNotFound, result.Error); err != nil {
