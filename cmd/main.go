@@ -3,6 +3,7 @@ package main
 import (
 	"fishing_company/pkg/config"
 	"fishing_company/pkg/db"
+	"fishing_company/pkg/middleware"
 	"fishing_company/pkg/routes"
 	"io"
 	"log"
@@ -42,7 +43,11 @@ func main() {
 
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
-	routes.RegisterRoutes(&router.RouterGroup, authEnforcer)
+
+	router.Use(middleware.AuthRequired)
+	router.Use(middleware.Authorization(authEnforcer))
+
+	routes.RegisterRoutes(&router.RouterGroup)
 	router.LoadHTMLGlob("ui/html/*/*.html")
 	router.Static("/static", "./ui/static")
 

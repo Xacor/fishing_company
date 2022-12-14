@@ -9,7 +9,6 @@ import (
 func tripRoutes(superRoute *gin.RouterGroup) {
 
 	tripRouter := superRoute.Group("/trips")
-
 	tripRouter.GET("/", controllers.GetTrips)
 	tripRouter.GET("/:id", controllers.GetTrip)
 	tripRouter.GET("/create", controllers.TripForm)

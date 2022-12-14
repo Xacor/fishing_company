@@ -2,6 +2,7 @@ package controllers_test
 
 import (
 	"fishing_company/pkg/config"
+	"fishing_company/pkg/db"
 	"fishing_company/pkg/routes"
 	"io"
 	"log"
@@ -10,14 +11,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupRouter() *gin.Engine {
+func setupRouter() *gin.Engine {
 	conf, err := config.LoadConfig("../../envs")
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -33,11 +33,6 @@ func SetupRouter() *gin.Engine {
 		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	}
 
-	authEnforcer, err := casbin.NewEnforcer("../../auth_model.conf", "../../policy.csv")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	router := gin.New()
 
 	store := cookie.NewStore([]byte(conf.Secret))
@@ -45,16 +40,19 @@ func SetupRouter() *gin.Engine {
 
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
-	routes.RegisterRoutes(&router.RouterGroup, authEnforcer)
+
+	routes.RegisterRoutes(&router.RouterGroup)
 	router.LoadHTMLGlob("../../ui/html/*/*.html")
 	router.Static("/static", "../../ui/static")
+
+	db.Init(conf.DBUrl)
 
 	return router
 
 }
 
 func TestIndex(t *testing.T) {
-	router := SetupRouter()
+	router := setupRouter()
 
 	var tests = []struct {
 		name     string

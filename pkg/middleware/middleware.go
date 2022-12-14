@@ -5,6 +5,7 @@ import (
 	"fishing_company/pkg/utils"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/sessions"
@@ -12,6 +13,12 @@ import (
 )
 
 func AuthRequired(c *gin.Context) {
+	log.Println("Auth Middleware")
+	log.Println("URL:", c.FullPath())
+	if strings.Contains(c.FullPath(), "/") || strings.Contains(c.Request.URL.RawPath, "/auth") {
+		c.Next()
+		return
+	}
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
 
@@ -23,11 +30,16 @@ func AuthRequired(c *gin.Context) {
 		c.Abort()
 		return
 	}
+
 	c.Next()
 }
 
 func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if strings.Contains(c.FullPath(), "/") || strings.Contains(c.FullPath(), "/auth") {
+			c.Next()
+			return
+		}
 		session := sessions.Default(c)
 		role := session.Get(globals.Rolekey)
 

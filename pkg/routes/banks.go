@@ -2,17 +2,13 @@ package routes
 
 import (
 	"fishing_company/pkg/controllers"
-	"fishing_company/pkg/middleware"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func bankRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func bankRoutes(superRoute *gin.RouterGroup) {
 
 	bankRouter := superRoute.Group("/banks")
-	bankRouter.Use(middleware.AuthRequired)
-	bankRouter.Use(middleware.Authorization(e))
 
 	bankRouter.GET("/", controllers.GetBanks)
 	bankRouter.GET("/:id", controllers.GetBank)

@@ -2,18 +2,13 @@ package routes
 
 import (
 	"fishing_company/pkg/controllers"
-	"fishing_company/pkg/middleware"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func employeeRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func employeeRoutes(superRoute *gin.RouterGroup) {
 
 	employeeRouter := superRoute.Group("/employees")
-
-	employeeRouter.Use(middleware.AuthRequired)
-	employeeRouter.Use(middleware.Authorization(e))
 
 	employeeRouter.GET("/", controllers.GetEmployees)
 	employeeRouter.GET("/create", controllers.EmployeeForm)

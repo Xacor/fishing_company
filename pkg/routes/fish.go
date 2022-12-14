@@ -2,19 +2,13 @@ package routes
 
 import (
 	"fishing_company/pkg/controllers"
-	"fishing_company/pkg/middleware"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
 
-func fishRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func fishRoutes(superRoute *gin.RouterGroup) {
 
 	fishRouter := superRoute.Group("/fishes")
-
-	fishRouter.Use(middleware.AuthRequired)
-	fishRouter.Use(middleware.Authorization(e))
-
 	fishRouter.GET("/", controllers.GetFishes)
 	fishRouter.GET("/create", controllers.FishForm)
 	fishRouter.POST("/create", controllers.CreateFish)
