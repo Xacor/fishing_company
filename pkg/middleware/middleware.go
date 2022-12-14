@@ -14,8 +14,8 @@ import (
 
 func AuthRequired(c *gin.Context) {
 	log.Println("Auth Middleware")
-	log.Println("URL:", c.FullPath())
-	if strings.Contains(c.FullPath(), "/") || strings.Contains(c.Request.URL.RawPath, "/auth") {
+	log.Println("URL:", c.FullPath(), len(c.FullPath()))
+	if len(c.FullPath()) == 0 || strings.Contains(c.FullPath(), "/auth") {
 		c.Next()
 		return
 	}
@@ -36,7 +36,7 @@ func AuthRequired(c *gin.Context) {
 
 func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.Contains(c.FullPath(), "/") || strings.Contains(c.FullPath(), "/auth") {
+		if c.FullPath() == "" || strings.Contains(c.FullPath(), "/auth") {
 			c.Next()
 			return
 		}
