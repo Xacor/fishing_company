@@ -16,8 +16,8 @@ type Config struct {
 	Secret  string `mapstructure:"SECRET"`
 }
 
-func LoadConfig() (c Config, err error) {
-	viper.AddConfigPath("./envs")
+func LoadConfig(path string) (c Config, err error) {
+	viper.AddConfigPath(path)
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 
