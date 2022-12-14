@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,7 +24,6 @@ func TestGetFishes(t *testing.T) {
 			req, _ := http.NewRequest(tt.method, tt.path, nil)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
-			log.Printf("%+v", w)
 			assert.Equal(t, tt.wantCode, w.Code)
 		})
 	}
