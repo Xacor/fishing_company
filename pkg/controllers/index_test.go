@@ -5,6 +5,7 @@ import (
 	"fishing_company/pkg/db"
 	"fishing_company/pkg/routes"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -37,9 +38,8 @@ func setupRouter() *gin.Engine {
 
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
-
-	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
+	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: ioutil.Discard}))
 
 	routes.RegisterRoutes(&router.RouterGroup)
 	router.LoadHTMLGlob("../../ui/html/*/*.html")
