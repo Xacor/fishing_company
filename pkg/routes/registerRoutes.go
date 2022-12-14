@@ -12,4 +12,5 @@ func RegisterRoutes(superRoute *gin.RouterGroup, enforcer *casbin.Enforcer) {
 	bankRoutes(superRoute, enforcer)
 	fishRoutes(superRoute, enforcer)
 	employeeRoutes(superRoute, enforcer)
+	tripRoutes(superRoute)
 }

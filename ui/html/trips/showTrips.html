@@ -1,0 +1,63 @@
+{{define "trips" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+<div class="container-lg">
+    <h3>Всего рейсов: {{.Number}}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Лодка</th>
+                <th scope="col">Команда</th>
+                <th scope="col">Рыба</th>
+                <th scope="col">Банки</th>
+                <th scope="col">Выход в море</th>
+                <th scope="col">Дата возвращения</th>
+                <th scope="col">Действия</th>
+            </tr>
+        <tbody>
+            {{range $index, $trip := .trips}}
+            <tr>
+                <td scope="row">{{ $trip.ID }}</td>
+                <td id="trip-name">{{$trip.Boat.Name}}</td>
+                <td>
+                    {{range $ind, $emp := $trip.Employees}}
+                        <li>{{ $emp.Lastname }} {{ $emp.Firstname }} </li>
+                    {{end}}
+                </td>
+                <td>
+                    {{range $ind, $ft := $trip.FishTypes}}
+                        <li>{{ $ft.Name }} </li>
+                    {{end}}
+                </td>
+                <td>
+                    {{range $ind, $sb := $trip.SeaBanks}}
+                        <li>{{ $sb.Name }} </li>
+                    {{end}}
+                </td>
+                <td>{{ $trip.DepartureDate.Format "02 January 2006" }}</td>
+                <td>
+                    {{ if eq $trip.ArrivalDate.String "2006-01-02 00:00:00 +0300 MSK"}}
+                        В рейсе...
+                    {{else}}
+                    {{ $trip.ArrivalDate.Format "02 January 2006" }}
+                    {{end}}
+                </td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a class="btn btn-primary" href="/trips/{{ $trip.ID }}">Просмотреть</a>
+                       
+                        {{ if eq $trip.ArrivalDate.String "2006-01-02 00:00:00 +0300 MSK" }}
+                        <a class="btn btn-secondary" href="/trips/{{ $trip.ID }}/end">Завершить</a>     
+                        {{end}}
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+    <a class="btn btn-primary" href="/trips/create">Новый рейс</a>
+</div>
+{{template "footer" -}}
+{{end}}
