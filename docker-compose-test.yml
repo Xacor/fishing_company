@@ -31,4 +31,4 @@ services:
       restart: on-failure
       
       depends_on:
-        - fishing_database
+        - "fishing_database"
