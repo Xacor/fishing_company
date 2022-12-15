@@ -18,18 +18,17 @@ services:
     ports: # Сопоставление портов хост-машины и контейнера
       - 3306:3306
 
-    restart: unless-stopped #условие для рестарта в случае остановки контейнера
 
-  # fishing_webserver:
-  #     container_name: fishing_webserver
-  #     hostname: fishing_webserver
-  #     build:
-  #         context: ./
-  #         dockerfile: dockerfile_test
-  #     volumes:
-  #       - ~/fishing_logs/:/var/log/fishing/
+  fishing_webserver:
+      container_name: fishing_webserver
+      hostname: fishing_webserver
+      build:
+          context: ./
+          dockerfile: dockerfile_test
+      volumes:
+        - ~/fishing_logs/:/var/log/fishing/
 
-  #     restart: on-failure
+      restart: on-failure
       
-  #     depends_on:
-  #       - fishing_database
+      depends_on:
+        - fishing_database
