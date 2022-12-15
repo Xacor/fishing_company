@@ -11,9 +11,9 @@ services:
       - /home/buildagent/dump:/docker-entrypoint-initdb.d
 
     environment: #переменные окружения
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${fishing_db}
+      - MYSQL_USER=${app}
+      - MYSQL_PASSWORD=${Pa55word}
     
     ports: # Сопоставление портов хост-машины и контейнера
       - 3306:3306
