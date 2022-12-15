@@ -28,7 +28,7 @@ services:
           dockerfile: dockerfile_test
       volumes:
         - ~/fishing_logs/:/var/log/fishing/
-        - ~/envs/:/usr/src/fishing_company/envs/
+        - /home/buildagent/envs/:/usr/src/fishing_company/envs/
 
       restart: on-failure
       
