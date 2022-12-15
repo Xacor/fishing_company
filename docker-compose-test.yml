@@ -2,33 +2,36 @@ version: '3'
 
 services:
 
-  fishing_database: #Имя сервиса
+  fishing_webserver:
+    container_name: fishing_webserver
+    hostname: fishing_webserver
+    build:
+      context: ./
+      dockerfile: dockerfile_test
+    volumes:
+      - ~/fishing_logs/:/var/log/fishing/
+
+    restart: on-failure
+
+    depends_on:
+      - "fishing_database"
+
+  fishing_database:
+    #Имя сервиса
     container_name: fishing_database #Имя с которым запустится контейнер
     hostname: fishing_database #Имя "хоста" которым будет считать себя контейнер
     image: mysql #Образ из которого запускается контейнер
-    volumes: #Подключаемые директории
+    volumes:
+      #Подключаемые директории
       - ~/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
       - /home/buildagent/dump:/docker-entrypoint-initdb.d
 
-    environment: #переменные окружения
+    environment:
+      #переменные окружения
       - MYSQL_DATABASE=fishing_db
       - MYSQL_USER=app
       - MYSQL_PASSWORD=Pa55word
-    
-    ports: # Сопоставление портов хост-машины и контейнера
+
+    ports:
+      # Сопоставление портов хост-машины и контейнера
       - 3306:3306
-
-
-  fishing_webserver:
-      container_name: fishing_webserver
-      hostname: fishing_webserver
-      build:
-          context: ./
-          dockerfile: dockerfile_test
-      volumes:
-        - ~/fishing_logs/:/var/log/fishing/
-
-      restart: on-failure
-      
-      depends_on:
-        - "fishing_database"
