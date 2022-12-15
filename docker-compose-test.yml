@@ -8,7 +8,7 @@ services:
     image: mysql #Образ из которого запускается контейнер
     volumes: #Подключаемые директории
       - ~/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
-      - ./mysql-dump:/docker-entrypoint-initdb.d
+      - /home/buildagent/dump:/docker-entrypoint-initdb.d
 
     environment: #переменные окружения
       - MYSQL_DATABASE=${MYSQL_DATABASE}
