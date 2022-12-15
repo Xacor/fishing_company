@@ -25,9 +25,7 @@ services:
       hostname: fishing_webserver
       build:
           context: ./
-          dockerfile: dockerfile
-      ports:
-        - 5000:5000
+          dockerfile: dockerfile_test
       volumes:
         - ~/fishing_logs/:/var/log/fishing/
         - ~/envs/:/usr/src/fishing_company/envs/

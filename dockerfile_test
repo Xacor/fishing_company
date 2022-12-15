@@ -1,0 +1,4 @@
+FROM golang:1.19
+WORKDIR /usr/src/fishing_company
+COPY . .
+RUN go test -v ./...
