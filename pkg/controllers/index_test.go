@@ -41,7 +41,7 @@ func setupRouter() *gin.Engine {
 	router.Use(gin.Recovery())
 	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: ioutil.Discard}))
 
-	routes.RegisterRoutes(&router.RouterGroup)
+	routes.RegisterRoutes(&router.RouterGroup, nil, true)
 	router.LoadHTMLGlob("../../ui/html/*/*.html")
 	router.Static("/static", "../../ui/static")
 

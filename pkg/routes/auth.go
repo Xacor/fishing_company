@@ -15,5 +15,5 @@ func authRoutes(superRoute *gin.RouterGroup) {
 	authRouter.GET("/register", controllers.RegisterForm)
 	authRouter.POST("/register", controllers.Register)
 
-	authRouter.GET("/logout")
+	authRouter.GET("/logout", controllers.Logout)
 }

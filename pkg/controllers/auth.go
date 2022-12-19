@@ -103,7 +103,7 @@ func Logout(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/auth/login")
+	c.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func RegisterForm(c *gin.Context) {
