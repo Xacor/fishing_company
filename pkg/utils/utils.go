@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/models"
 	"log"
 	"strings"
+
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/models"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

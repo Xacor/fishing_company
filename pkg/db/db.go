@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"fishing_company/pkg/models"
+	"github.com/Xacor/fishing_company/pkg/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

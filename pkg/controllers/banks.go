@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/models"
-	"fishing_company/pkg/utils"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/models"
+	"github.com/Xacor/fishing_company/pkg/utils"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

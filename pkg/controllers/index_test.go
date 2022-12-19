@@ -1,9 +1,6 @@
 package controllers_test
 
 import (
-	"fishing_company/pkg/config"
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/routes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,6 +8,10 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/Xacor/fishing_company/pkg/config"
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/routes"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"

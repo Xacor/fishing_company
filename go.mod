@@ -1,4 +1,4 @@
-module fishing_company
+module github.com/Xacor/fishing_company
 
 go 1.19
 

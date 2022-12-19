@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/utils"
 	"log"
 	"net/http"
+
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/sessions"

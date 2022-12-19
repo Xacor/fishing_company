@@ -1,12 +1,14 @@
 package main
 
 import (
-	"fishing_company/pkg/config"
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/routes"
 	"io"
 	"log"
 	"os"
+
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/routes"
+
+	"github.com/Xacor/fishing_company/pkg/config"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/sessions"

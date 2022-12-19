@@ -1,8 +1,9 @@
 package utils_test
 
 import (
-	"fishing_company/pkg/utils"
 	"testing"
+
+	"github.com/Xacor/fishing_company/pkg/utils"
 )
 
 func TestEmptyUserPass(t *testing.T) {
