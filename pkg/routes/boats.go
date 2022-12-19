@@ -8,13 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func boatRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func boatRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 
 	boatRouter := superRoute.Group("/boats")
-	boatRouter.Use(middleware.AuthRequired)
-	boatRouter.Use(middleware.Authorization(e))
 
-	boatRouter.GET("/", controllers.GetBoats)
+	if !isTesting {
+		boatRouter.Use(middleware.AuthRequired, middleware.Authorization(authEnforcer))
+	}
+
+	boatRouter.GET("", controllers.GetBoats)
 	boatRouter.GET("/create", controllers.BoatForm)
 	boatRouter.POST("/create", controllers.CreateBoat)
 	boatRouter.GET("/:id", controllers.GetBoat)

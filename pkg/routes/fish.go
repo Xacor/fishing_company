@@ -8,12 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func fishRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func fishRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 
 	fishRouter := superRoute.Group("/fishes")
 
-	fishRouter.Use(middleware.AuthRequired)
-	fishRouter.Use(middleware.Authorization(e))
+	if !isTesting {
+		fishRouter.Use(middleware.AuthRequired, middleware.Authorization(authEnforcer))
+	}
 
 	fishRouter.GET("/", controllers.GetFishes)
 	fishRouter.GET("/create", controllers.FishForm)

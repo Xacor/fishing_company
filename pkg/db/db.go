@@ -34,7 +34,7 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 }
 
 func Init(url string) {
-	db, err := ConnectLoop(time.Second*10, mysql.Open(url))
+	db, err := ConnectLoop(time.Second*30, mysql.Open(url))
 
 	if err != nil {
 		log.Fatalln(err)

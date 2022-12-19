@@ -12,6 +12,7 @@ import (
 )
 
 func AuthRequired(c *gin.Context) {
+
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
 
@@ -23,6 +24,7 @@ func AuthRequired(c *gin.Context) {
 		c.Abort()
 		return
 	}
+
 	c.Next()
 }
 

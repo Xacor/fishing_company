@@ -8,12 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func employeeRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func employeeRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 
 	employeeRouter := superRoute.Group("/employees")
 
-	employeeRouter.Use(middleware.AuthRequired)
-	employeeRouter.Use(middleware.Authorization(e))
+	if !isTesting {
+		employeeRouter.Use(middleware.AuthRequired, middleware.Authorization(authEnforcer))
+	}
 
 	employeeRouter.GET("/", controllers.GetEmployees)
 	employeeRouter.GET("/create", controllers.EmployeeForm)

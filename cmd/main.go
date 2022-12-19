@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	conf, err := config.LoadConfig()
+	conf, err := config.LoadConfig("./envs")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -42,10 +42,10 @@ func main() {
 
 	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
 	router.Use(gin.Recovery())
-	routes.RegisterRoutes(&router.RouterGroup, authEnforcer)
+
+	routes.RegisterRoutes(&router.RouterGroup, authEnforcer, false)
 	router.LoadHTMLGlob("ui/html/*/*.html")
 	router.Static("/static", "./ui/static")
-	//router.LoadHTMLGlob("ui/html/**/*")
 
 	db.Init(conf.DBUrl)
 

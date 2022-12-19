@@ -8,13 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func bankRoutes(superRoute *gin.RouterGroup, e *casbin.Enforcer) {
+func bankRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 
 	bankRouter := superRoute.Group("/banks")
-	bankRouter.Use(middleware.AuthRequired)
-	bankRouter.Use(middleware.Authorization(e))
+	if !isTesting {
+		bankRouter.Use(middleware.AuthRequired, middleware.Authorization(authEnforcer))
+	}
 
-	bankRouter.GET("/", controllers.GetBanks)
+	bankRouter.GET("", controllers.GetBanks)
 	bankRouter.GET("/:id", controllers.GetBank)
 	bankRouter.GET("/create", controllers.BankForm)
 	bankRouter.POST("/create", controllers.CreateBank)

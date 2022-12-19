@@ -103,7 +103,7 @@ func Logout(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/auth/login")
+	c.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func RegisterForm(c *gin.Context) {
@@ -147,7 +147,7 @@ func Register(c *gin.Context) {
 
 	if userExists.ID != 0 {
 		utils.FlashMessage(c, "Пользователь с таким именем уже существует")
-		c.HTML(http.StatusOK, "register.html", gin.H{"alerts": utils.Flashes(c)})
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
 

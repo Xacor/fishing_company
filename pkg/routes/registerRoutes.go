@@ -5,12 +5,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(superRoute *gin.RouterGroup, enforcer *casbin.Enforcer) {
-	boatRoutes(superRoute, enforcer)
-	authRoutes(superRoute, enforcer)
+func RegisterRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 	indexRoutes(superRoute)
-	bankRoutes(superRoute, enforcer)
-	fishRoutes(superRoute, enforcer)
-	employeeRoutes(superRoute, enforcer)
-	tripRoutes(superRoute)
+	authRoutes(superRoute)
+
+	boatRoutes(superRoute, authEnforcer, isTesting)
+	bankRoutes(superRoute, authEnforcer, isTesting)
+	fishRoutes(superRoute, authEnforcer, isTesting)
+	employeeRoutes(superRoute, authEnforcer, isTesting)
+	tripRoutes(superRoute, authEnforcer, isTesting)
 }
