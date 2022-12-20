@@ -29,7 +29,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
 	store := cookie.NewStore([]byte(conf.Secret))
