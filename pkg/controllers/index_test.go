@@ -33,7 +33,7 @@ func setupRouter() *gin.Engine {
 	router.LoadHTMLGlob("../../ui/html/*/*.html")
 	router.Static("/static", "../../ui/static")
 
-	db.Init(conf.DBUrl)
+	db.Init(conf.TestDBUrl)
 
 	return router
 

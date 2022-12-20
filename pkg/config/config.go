@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	Port   string `mapstructure:"PORT"`
-	DBUrl  string `mapstructure:"DB_URL"`
-	Secret string `mapstructure:"SECRET"`
+	Port      string `mapstructure:"PORT"`
+	DBUrl     string `mapstructure:"DB_URL"`
+	TestDBUrl string `mapstructure:"TEST_DB_URL"`
+	Secret    string `mapstructure:"SECRET"`
 }
 
 func LoadConfig(path string) (c Config, err error) {
