@@ -1,0 +1,62 @@
+{{define "boats" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg">
+    <h1>Всего лодок {{.Number}}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Тип</th>
+                <th scope="col">Водоизмещение</th>
+                <th scope="col">Дата постройки</th>
+                <th scope="col">Действия</th>
+            </tr>
+        <tbody>
+            {{range $index, $boat := .Boats}}
+            <tr>
+                <th scope="row">{{ $boat.ID }}</th>
+                <td id="boat-name">{{$boat.Name}}</td>
+                <td>{{$boat.BtypeID}}</td>
+                <td>{{$boat.Displacement}}</td>
+                <td>{{$boat.Build_date.Format "2006-01-02"}}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a class="btn btn-primary" href="/boats/{{ $boat.ID }}">Просмотреть</a>
+                        <a class="btn btn-secondary" href="/boats/{{ $boat.ID }}/update">Редактировать</a>
+                        <button type="button" class="btn btn-danger" data-url="/boats/{{ $boat.ID }}/delete"
+                            data-bs-toggle="modal" data-bs-target="#delete-boat-modal">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+    <a class="btn btn-primary" href="/boats/create">Создать судно</a>
+</div>
+
+<div class="modal fade" id="delete-boat-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Удаление судна</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы точно хотите удалить судно <span id="boat_name_modal"></span>?
+                <form action="" method="post" id="modal-form">
+                    <input id="delete-btn" type="submit" class="d-none">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <label for="delete-btn" class="btn btn-danger">Да</label>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "footer" -}}
+{{end}}

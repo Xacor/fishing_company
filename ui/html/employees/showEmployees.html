@@ -1,0 +1,68 @@
+{{define "employees" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg">
+    <h1>Всего сотрудников {{.Number}}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">ФИО</th>
+                <th scope="col">Адрес</th>
+                <th scope="col">Год рождения</th>
+                <th scope="col">Номер должности</th>
+                <th scope="col">Действия</th>
+            </tr>
+        <tbody>
+            {{range $index, $employee := .Employees}}
+            <tr>
+                <th scope="row">{{ $employee.ID }}</th>
+                <td id="employee-name">
+                    {{if len $employee.Middlename}}
+                       {{$employee.Lastname}} {{$employee.Firstname}} {{$employee.Middlename}}
+                    {{else}}
+                        {{$employee.Lastname}} {{$employee.Firstname}}
+                    {{end}}
+                </td>
+                <td>{{$employee.Address}}</td>
+                <td>{{$employee.Birth_date.Format "2006-01-02"}}</td>
+                <td>{{$employee.PositionID}}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a class="btn btn-primary" href="/employees/{{ $employee.ID }}">Просмотреть</a>
+                        <a class="btn btn-secondary" href="/employees/{{ $employee.ID }}/update">Редактировать</a>
+                        <button type="button" class="btn btn-danger" data-url="/employees/{{ $employee.ID }}/delete"
+                            data-bs-toggle="modal" data-bs-target="#delete-employee-modal">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+    <a class="btn btn-primary" href="/employees/create">Добавить сотрудника</a>
+</div>
+
+<div class="modal fade" id="delete-employee-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Удаление сотрудника</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы точно хотите удалить сотрудника <span id="employee_name_modal"></span>?
+                <form action="" method="post" id="modal-form">
+                    <input id="delete-btn" type="submit" class="d-none">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <label for="delete-btn" class="btn btn-danger">Да</label>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "footer" -}}
+{{end}}

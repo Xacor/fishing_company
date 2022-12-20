@@ -1,0 +1,15 @@
+{{define "fishForm" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg">
+    <form method="POST" action="./create" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="name" class="form-label">Название</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <input type="submit" class="btn btn-primary" value="Создать">
+    </form>
+</div>
+{{template "footer" -}}
+{{end}}

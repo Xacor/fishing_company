@@ -1,0 +1,18 @@
+{{define "employee"}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg">
+    <ul class="list-group">
+        <li class="list-group-item">{{.employee.Lastname}}</li>
+        <li class="list-group-item">{{.employee.Firstname}}</li>
+        {{if len .employee.Middlename}}
+            <li class="list-group-item">{{.employee.Middlename}}</li>
+        {{end}}
+        <li class="list-group-item">{{.employee.PositionID}}</li>
+        <li class="list-group-item">{{.employee.Address}}</li>
+        <li class="list-group-item">{{.employee.Birth_date.Format "2006-01-02"}}</li>
+    </ul>
+</div>
+{{template "footer" -}}
+{{end}}

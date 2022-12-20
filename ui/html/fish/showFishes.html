@@ -1,0 +1,53 @@
+{{define "fishes" -}}
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg">
+    <h3>Всего сортов рыбы: {{.Number}}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+            </tr>
+        <tbody>
+            {{range $index, $fish := .fishes}}
+            <tr>
+                <th scope="row">{{ $fish.ID }}</th>
+                <td id="fish-name">{{ $fish.Name }}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-danger" data-url="/fishes/{{ $fish.ID }}/delete"
+                            data-bs-toggle="modal" data-bs-target="#delete-fish-modal">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+        </thead>
+    </table>
+    <a class="btn btn-primary" href="/fishes/create">Создать сорт рыбы</a>
+</div>
+
+<div class="modal fade" id="delete-fish-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Удаление сорта рыбы</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы точно хотите удалить сорт рыбы <span id="fish_name_modal"></span>?
+                <form action="" method="post" id="modal-form">
+                    <input id="delete-btn" type="submit" class="d-none">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <label for="delete-btn" class="btn btn-danger">Да</label>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "footer" -}}
+{{end}}

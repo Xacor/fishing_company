@@ -1,0 +1,29 @@
+{{template "header" -}}
+{{template "navbar" . -}}
+{{template "alert" .}}
+<div class="container-lg h-100 my-5">
+    <form class="container-fluid m-auto bg-white p-5 border round" method="POST" style="max-width: 30rem;">
+        <div class="form-floating mb-3">
+            <input autocomplete="off" type="text" class="form-control" name="username" id="username" placeholder="Логин"
+                required>
+            <label for="username">Логин</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Пароль" required>
+            <label for="password">Пароль</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="conf-password" name="conf-password"
+                placeholder="Повторите пароль" required>
+            <label for="conf-password">Пароль</label>
+        </div>
+        <select class="form-select mb-3" aria-label="Default select example" name="role" id="role">
+            <option selected value="1">Admin</option>
+            <option value="2">User</option>
+        </select>
+
+        <button type="submit" class="btn btn-dark w-100">Зарегистрироваться</button>
+    </form>
+</div>
+{{template "footer" -}}
