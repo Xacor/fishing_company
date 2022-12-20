@@ -16,17 +16,16 @@ func LoadConfig(path string) (Config, error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
-
 	var c Config
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Error(err)
+		return Config{}, err
 	}
 
 	if err := viper.Unmarshal(&c); err != nil {
 		log.Error(err)
-		return c, nil
+		return Config{}, err
 	}
-	log.Info(c)
 	return c, nil
 }
