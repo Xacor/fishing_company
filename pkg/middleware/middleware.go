@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Xacor/fishing_company/pkg/globals"
 	"github.com/Xacor/fishing_company/pkg/utils"
@@ -43,7 +44,7 @@ func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 			return
 		}
 		if !ok {
-			log.Warnf("User %v trys to access privileged resource", session.Get(globals.Userkey))
+			log.Warnf("User %v tries to access privileged resource", session.Get(globals.Userkey))
 			utils.FlashMessage(c, "У вас недостаточно прав на это действие")
 			session.Save()
 			c.Redirect(http.StatusSeeOther, "/")
@@ -53,4 +54,28 @@ func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func Logger(c *gin.Context) {
+	logClient := log.New()
+
+	start := time.Now()
+
+	// process request
+	c.Next()
+
+	// End Time
+	end := time.Now()
+
+	//execution time
+	latency := end.Sub(start)
+
+	logClient.WithFields(log.Fields{
+		"ip":      c.ClientIP(),
+		"method":  c.Request.Method,
+		"path":    c.Request.URL.Path,
+		"code":    c.Writer.Status(),
+		"latency": latency,
+		"agent":   c.Request.UserAgent(),
+	}).Info()
 }

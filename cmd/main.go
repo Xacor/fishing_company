@@ -5,7 +5,7 @@ import (
 
 	"github.com/Xacor/fishing_company/pkg/config"
 	"github.com/Xacor/fishing_company/pkg/db"
-	"github.com/Xacor/fishing_company/pkg/logger"
+	"github.com/Xacor/fishing_company/pkg/middleware"
 	"github.com/Xacor/fishing_company/pkg/routes"
 	log "github.com/sirupsen/logrus"
 
@@ -20,9 +20,6 @@ func main() {
 	log.SetOutput(os.Stdout)
 	log.SetReportCaller(true)
 
-	logWirter := log.New().Writer()
-	defer logWirter.Close()
-
 	conf, err := config.LoadConfig("./envs")
 	if err != nil {
 		log.Fatalln(err)
@@ -32,18 +29,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
-
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
-
-	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-		Formatter: logger.CustomHttpFormatter,
-		Output:    logWirter,
-	}))
+	router.Use(middleware.Logger)
 	router.Use(gin.Recovery())
-
 	routes.RegisterRoutes(&router.RouterGroup, authEnforcer, false)
 	router.LoadHTMLGlob("ui/html/*/*.html")
 	router.Static("/static", "./ui/static")
