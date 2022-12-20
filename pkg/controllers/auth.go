@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Xacor/fishing_company/pkg/db"
 	"github.com/Xacor/fishing_company/pkg/globals"
 	"github.com/Xacor/fishing_company/pkg/models"
 	"github.com/Xacor/fishing_company/pkg/utils"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -50,12 +50,14 @@ func Login(c *gin.Context) {
 	sessionUser := session.Get(globals.Userkey)
 	if sessionUser != nil {
 		utils.FlashMessage(c, "Сначала необходимо выйти")
+
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
 
 	var creds Credentials
 	if err := c.ShouldBind(&creds); err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Даные формы некорректны")
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -69,6 +71,7 @@ func Login(c *gin.Context) {
 
 	user, err := utils.CheckUserPass(creds.Username, creds.Password)
 	if err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Введены неверные учтеные данные")
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -78,6 +81,7 @@ func Login(c *gin.Context) {
 	session.Set(globals.Rolekey, user.Role.Name)
 
 	if err := session.Save(); err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Ошибка во время сохранения сессии")
 		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -89,8 +93,6 @@ func Login(c *gin.Context) {
 func Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(globals.Userkey)
-
-	log.Println("logging out user:", user)
 	if user == nil {
 		utils.FlashMessage(c, "Пользователь не найден")
 		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
@@ -99,6 +101,7 @@ func Logout(c *gin.Context) {
 
 	session.Clear()
 	if err := session.Save(); err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Ошибка во время удаления сессии")
 		c.HTML(http.StatusInternalServerError, "login.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -117,7 +120,7 @@ func Register(c *gin.Context) {
 	var creds RegisterCred
 
 	if err := c.ShouldBind(&creds); err != nil {
-		log.Println(err)
+		log.Error(err)
 		utils.FlashMessage(c, "Неверные данные формы")
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return
@@ -131,20 +134,19 @@ func Register(c *gin.Context) {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 	if err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Ошибка сервера")
 		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"alerts": utils.Flashes(c)})
-		log.Println(err)
 		return
 	}
 
 	var userExists models.User
 	if err := db.DB.Find(&userExists, "name = ?", creds.Username).Error; err != nil {
-		log.Println(err)
+		log.Error(err)
 		utils.FlashMessage(c, "Ошибка при запросе к безе данных")
 		c.HTML(http.StatusOK, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return
 	}
-	log.Printf("%+v", userExists)
 
 	if userExists.ID != 0 {
 		utils.FlashMessage(c, "Пользователь с таким именем уже существует")
@@ -158,7 +160,7 @@ func Register(c *gin.Context) {
 		RoleID:   creds.Role,
 	}
 	if err := db.DB.Create(&newUser).Error; err != nil {
-		log.Println(err)
+		log.Error(err)
 		utils.FlashMessage(c, "Ошибка при запросе к безе данных")
 		c.HTML(http.StatusInternalServerError, "register.html", gin.H{"alerts": utils.Flashes(c)})
 		return

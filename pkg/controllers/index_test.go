@@ -1,12 +1,9 @@
 package controllers_test
 
 import (
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/Xacor/fishing_company/pkg/config"
@@ -25,22 +22,12 @@ func setupRouter() *gin.Engine {
 		log.Fatalln(err.Error())
 	}
 
-	switch conf.LogO {
-	case "file":
-		gin.DisableConsoleColor()
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f)
-	case "all":
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-	}
-
 	router := gin.New()
 
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
 	router.Use(gin.Recovery())
-	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: ioutil.Discard}))
+	router.Use(gin.Logger())
 
 	routes.RegisterRoutes(&router.RouterGroup, nil, true)
 	router.LoadHTMLGlob("../../ui/html/*/*.html")

@@ -9,9 +9,9 @@ import (
 	"github.com/Xacor/fishing_company/pkg/globals"
 	"github.com/Xacor/fishing_company/pkg/models"
 	"github.com/Xacor/fishing_company/pkg/utils"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetBank(c *gin.Context) {
@@ -22,6 +22,7 @@ func GetBank(c *gin.Context) {
 	id := c.Param("id")
 
 	if result := db.DB.First(&bank, id); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "bank", gin.H{
 			"user":   user,
@@ -43,6 +44,7 @@ func GetBanks(c *gin.Context) {
 	var banks []models.SeaBank
 	result := db.DB.Find(&banks)
 	if result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "banks", gin.H{
 			"user":   user,
@@ -77,6 +79,7 @@ func CreateBank(c *gin.Context) {
 	var bank models.SeaBank
 	err := c.ShouldBind(&bank)
 	if err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при обработке формы")
 		c.HTML(http.StatusBadRequest, "bankForm", gin.H{
 			"user":   user,
@@ -85,6 +88,7 @@ func CreateBank(c *gin.Context) {
 		return
 	}
 	if result := db.DB.Create(&bank); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "bankForm", gin.H{
 			"user":   user,
@@ -105,6 +109,7 @@ func DeleteBank(c *gin.Context) {
 	var bank models.SeaBank
 	_ = db.DB.First(&bank, bankID)
 	if result := db.DB.Delete(&bank); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "banks", gin.H{
 			"user":   user,
