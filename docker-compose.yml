@@ -16,6 +16,7 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
 
     ports:
       # Сопоставление портов хост-машины и контейнера
@@ -31,6 +32,9 @@ services:
       - 5000:5000
     volumes:
       - ./envs/:/usr/src/fishing_company/envs/
+
+    environment:
+      - GIN_MODE=release
 
     restart: on-failure
 
