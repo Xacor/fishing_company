@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fishing_company/pkg/config"
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/routes"
-	"io"
-	"log"
 	"os"
+
+	"github.com/Xacor/fishing_company/pkg/config"
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/middleware"
+	"github.com/Xacor/fishing_company/pkg/routes"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-contrib/sessions"
@@ -15,34 +16,26 @@ import (
 )
 
 func main() {
+
+	log.SetOutput(os.Stdout)
+	log.SetReportCaller(true)
+
 	conf, err := config.LoadConfig("./envs")
 	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	switch conf.LogO {
-	case "file":
-		gin.DisableConsoleColor()
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f)
-	case "all":
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+		log.Fatalln(err)
 	}
 
 	authEnforcer, err := casbin.NewEnforcer("./auth_model.conf", "./policy.csv")
 	if err != nil {
 		log.Fatalln(err)
 	}
+	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
-
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
-
-	router.Use(gin.LoggerWithFormatter(config.CustomLogFormatter))
+	router.Use(middleware.Logger)
 	router.Use(gin.Recovery())
-
 	routes.RegisterRoutes(&router.RouterGroup, authEnforcer, false)
 	router.LoadHTMLGlob("ui/html/*/*.html")
 	router.Static("/static", "./ui/static")

@@ -1,18 +1,20 @@
 package controllers
 
 import (
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/models"
-	"fishing_company/pkg/utils"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/models"
+	"github.com/Xacor/fishing_company/pkg/utils"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func EmployeeForm(c *gin.Context) {
@@ -21,6 +23,7 @@ func EmployeeForm(c *gin.Context) {
 
 	var employeePositions []models.Position
 	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
 			"user":   user,
@@ -54,6 +57,7 @@ func CreateEmployee(c *gin.Context) {
 	employee.PositionID = uint8(positionID)
 
 	if result := db.DB.Create(&employee); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "createEmployee", gin.H{
 			"user":   user,
@@ -74,6 +78,7 @@ func DeleteEmployee(c *gin.Context) {
 	var employee models.Employee
 
 	if result := db.DB.Delete(&employee, employeeID); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "employees", gin.H{
 			"user":   user,
@@ -95,6 +100,7 @@ func GetEmployee(c *gin.Context) {
 	id := c.Param("id")
 
 	if result := db.DB.First(&employee, id); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "employee", gin.H{
 			"user":   user,
@@ -115,6 +121,7 @@ func GetEmployees(c *gin.Context) {
 	var employees []models.Employee
 	result := db.DB.Find(&employees)
 	if result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "employees", gin.H{
 			"user":   user,
@@ -137,6 +144,7 @@ func UpdateEmployeeForm(c *gin.Context) {
 	var employee models.Employee
 
 	if result := db.DB.First(&employee, employeeId); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
 			"user":   user,
@@ -147,6 +155,7 @@ func UpdateEmployeeForm(c *gin.Context) {
 
 	var employeePositions []models.Position
 	if err := db.DB.Find(&employeePositions).Error; err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
 			"user":   user,
@@ -171,6 +180,7 @@ func UpdateEmployee(c *gin.Context) {
 	var employee models.Employee
 
 	if result := db.DB.First(&employee, employeeId); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
 			"user":   user,
@@ -202,6 +212,7 @@ func UpdateEmployee(c *gin.Context) {
 	}
 
 	if result := db.DB.Save(&employee); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateEmployee", gin.H{
 			"user":   user,

@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/utils"
 	"net/http"
+
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/utils"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

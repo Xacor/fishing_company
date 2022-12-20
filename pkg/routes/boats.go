@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"fishing_company/pkg/controllers"
-	"fishing_company/pkg/middleware"
+	"github.com/Xacor/fishing_company/pkg/controllers"
+	"github.com/Xacor/fishing_company/pkg/middleware"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"

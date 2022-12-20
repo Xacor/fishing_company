@@ -2,48 +2,33 @@ package config
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Port    string `mapstructure:"PORT"`
-	DBUrl   string `mapstructure:"DB_URL"`
-	LogO    string `mapstructure:"LOGGER_TYPE"` //posible values: file, console, all
-	LogFile string `mapstructure:"LOG_FILE"`    //filename with extension
-	Secret  string `mapstructure:"SECRET"`
+	Port      string `mapstructure:"PORT"`
+	DBUrl     string `mapstructure:"DB_URL"`
+	TestDBUrl string `mapstructure:"TEST_DB_URL"`
+	Secret    string `mapstructure:"SECRET"`
 }
 
 func LoadConfig(path string) (c Config, err error) {
 	viper.AddConfigPath(path)
+	viper.SetConfigName("config")
 	viper.SetConfigType("env")
-	viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		err = fmt.Errorf("fatal error config file: %w", err)
-		return
+	if err := viper.ReadInConfig(); err != nil {
+		err = fmt.Errorf("Config: %w", err)
+	} else {
+		log.Info("Trying to load settings from envs")
+		viper.AutomaticEnv()
 	}
 
-	err = viper.Unmarshal(&c)
-	if err != nil {
-		err = fmt.Errorf("unable to decode into struct, %v", err)
+	if err = viper.Unmarshal(&c); err != nil {
+		err = fmt.Errorf("Unable to decode into struct, %v", err)
 		return
 	}
 	return
-}
-
-func CustomLogFormatter(param gin.LogFormatterParams) string {
-	return fmt.Sprintf("%s - [%s] %s %s %s %d %s \"%s\"\n",
-		param.ClientIP,
-		param.TimeStamp.Format(time.RFC1123),
-		param.Method,
-		param.Path,
-		param.Request.Proto,
-		param.StatusCode,
-		param.Latency,
-		param.ErrorMessage,
-	)
 }

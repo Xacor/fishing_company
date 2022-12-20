@@ -1,16 +1,14 @@
 package controllers_test
 
 import (
-	"fishing_company/pkg/config"
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/routes"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
+
+	"github.com/Xacor/fishing_company/pkg/config"
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/routes"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -24,28 +22,18 @@ func setupRouter() *gin.Engine {
 		log.Fatalln(err.Error())
 	}
 
-	switch conf.LogO {
-	case "file":
-		gin.DisableConsoleColor()
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f)
-	case "all":
-		f, _ := os.Create(conf.LogFile)
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-	}
-
 	router := gin.New()
 
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
 	router.Use(gin.Recovery())
-	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: ioutil.Discard}))
+	router.Use(gin.Logger())
 
 	routes.RegisterRoutes(&router.RouterGroup, nil, true)
 	router.LoadHTMLGlob("../../ui/html/*/*.html")
 	router.Static("/static", "../../ui/static")
 
-	db.Init(conf.DBUrl)
+	db.Init(conf.TestDBUrl)
 
 	return router
 

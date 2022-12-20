@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"fishing_company/pkg/controllers"
+	"github.com/Xacor/fishing_company/pkg/controllers"
 
 	"github.com/gin-gonic/gin"
 )

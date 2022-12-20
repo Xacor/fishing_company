@@ -1,15 +1,17 @@
 package controllers
 
 import (
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/models"
-	"fishing_company/pkg/utils"
 	"net/http"
 	"net/url"
 
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/models"
+	"github.com/Xacor/fishing_company/pkg/utils"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetFishes(c *gin.Context) {
@@ -19,6 +21,7 @@ func GetFishes(c *gin.Context) {
 	var fishes []models.FishType
 	result := db.DB.Find(&fishes)
 	if result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "fishes", gin.H{
 			"user":   user,
@@ -52,6 +55,7 @@ func CreateFish(c *gin.Context) {
 	var fish models.FishType
 
 	if err := c.ShouldBind(&fish); err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при обработке формы")
 		c.HTML(http.StatusBadRequest, "fishForm", gin.H{
 			"user":   user,
@@ -61,6 +65,7 @@ func CreateFish(c *gin.Context) {
 	}
 
 	if result := db.DB.Create(&fish); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "fishForm", gin.H{
 			"user":   user,
@@ -80,6 +85,7 @@ func DeleteFish(c *gin.Context) {
 	var fish models.FishType
 
 	if result := db.DB.Delete(&fish, fishID); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "fishForm", gin.H{
 			"user":   user,

@@ -2,12 +2,14 @@ package controllers_test
 
 import (
 	"bytes"
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/models"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/Xacor/fishing_company/pkg/models"
+
+	"github.com/Xacor/fishing_company/pkg/db"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,18 +1,20 @@
 package controllers
 
 import (
-	"fishing_company/pkg/db"
-	"fishing_company/pkg/globals"
-	"fishing_company/pkg/models"
-	"fishing_company/pkg/utils"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
+	"github.com/Xacor/fishing_company/pkg/db"
+	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/models"
+	"github.com/Xacor/fishing_company/pkg/utils"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func BoatForm(c *gin.Context) {
@@ -22,6 +24,7 @@ func BoatForm(c *gin.Context) {
 	var boatTypes []models.Btype
 
 	if err := db.DB.Find(&boatTypes).Error; err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "createBoat", gin.H{
 			"user":   user,
@@ -54,6 +57,7 @@ func CreateBoat(c *gin.Context) {
 	boat.Build_date = date
 
 	if err := db.DB.Where("name = ?", boat.Name).First(&models.Boat{}).Error; err == nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Судно с таким именем уже существует или существовало")
 		c.HTML(http.StatusBadRequest, "createBoat", gin.H{
 			"user":   user,
@@ -63,6 +67,7 @@ func CreateBoat(c *gin.Context) {
 	}
 
 	if result := db.DB.Create(&boat); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "boats", gin.H{
 			"user":   user,
@@ -81,6 +86,7 @@ func DeleteBoat(c *gin.Context) {
 	boatID := c.Param("id")
 
 	if result := db.DB.Delete(&models.Boat{}, boatID); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "boats", gin.H{
 			"user":   user,
@@ -102,6 +108,7 @@ func GetBoat(c *gin.Context) {
 	id := c.Param("id")
 
 	if result := db.DB.First(&boat, id); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "boat", gin.H{
 			"user":   user,
@@ -123,6 +130,7 @@ func GetBoats(c *gin.Context) {
 	var boats []models.Boat
 	result := db.DB.Find(&boats)
 	if result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "boats", gin.H{
 			"user":   user,
@@ -148,6 +156,7 @@ func UpdateBoatForm(c *gin.Context) {
 	var boatTypes []models.Btype
 
 	if err := db.DB.Find(&boatTypes).Error; err != nil {
+		log.Error(err)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
 			"user":   user,
@@ -157,6 +166,7 @@ func UpdateBoatForm(c *gin.Context) {
 	}
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
 			"user":   user,
@@ -180,6 +190,7 @@ func UpdateBoat(c *gin.Context) {
 	var boat models.Boat
 
 	if result := db.DB.First(&boat, boatId); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
 			"user":   user,
@@ -203,6 +214,7 @@ func UpdateBoat(c *gin.Context) {
 	}
 
 	if result := db.DB.Save(&boat); result.Error != nil {
+		log.Error(result.Error)
 		utils.FlashMessage(c, "Возникла ошибка при запросе к базе данных")
 		c.HTML(http.StatusInternalServerError, "updateBoat", gin.H{
 			"user":   user,
