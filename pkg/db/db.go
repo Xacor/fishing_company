@@ -2,8 +2,9 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/Xacor/fishing_company/pkg/models"
 
@@ -28,7 +29,7 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 			if err == nil {
 				return db, nil
 			}
-			log.Println(err)
+			log.Error(err)
 		}
 	}
 }

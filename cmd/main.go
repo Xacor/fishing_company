@@ -41,6 +41,7 @@ func main() {
 
 	db.Init(conf.DBUrl)
 
+	log.Info("Starting server...")
 	if err := router.Run(conf.Port); err != nil {
 		log.Fatalln(err)
 	}
