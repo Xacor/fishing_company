@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -14,21 +12,20 @@ type Config struct {
 	Secret    string `mapstructure:"SECRET"`
 }
 
-func LoadConfig(path string) (c Config, err error) {
+func LoadConfig(path string) (Config, error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigName("config")
 	viper.SetConfigType("env")
+	viper.AutomaticEnv()
+	var c Config
 
 	if err := viper.ReadInConfig(); err != nil {
-		err = fmt.Errorf("Config: %w", err)
-	} else {
-		log.Info("Trying to load settings from envs")
-		viper.AutomaticEnv()
+		log.Error(err)
+		return Config{}, err
 	}
 
-	if err = viper.Unmarshal(&c); err != nil {
-		err = fmt.Errorf("Unable to decode into struct, %v", err)
-		return
+	if err := viper.Unmarshal(&c); err != nil {
+		log.Error(err)
+		return Config{}, err
 	}
-	return
+	return c, nil
 }
