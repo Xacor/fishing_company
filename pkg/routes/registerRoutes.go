@@ -8,7 +8,7 @@ import (
 func RegisterRoutes(superRoute *gin.RouterGroup, authEnforcer *casbin.Enforcer, isTesting bool) {
 	indexRoutes(superRoute)
 	authRoutes(superRoute)
-
+	prometheusRoutes(superRoute)
 	boatRoutes(superRoute, authEnforcer, isTesting)
 	bankRoutes(superRoute, authEnforcer, isTesting)
 	fishRoutes(superRoute, authEnforcer, isTesting)
