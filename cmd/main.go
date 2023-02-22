@@ -33,7 +33,7 @@ func main() {
 	router := gin.New()
 	store := cookie.NewStore([]byte(conf.Secret))
 	router.Use(sessions.Sessions("session", store))
-	router.Use(middleware.Logger)
+	router.Use(middleware.Logger, middleware.Prometheus)
 	router.Use(gin.Recovery())
 	routes.RegisterRoutes(&router.RouterGroup, authEnforcer, false)
 	router.LoadHTMLGlob("ui/html/*/*.html")
