@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Xacor/fishing_company/pkg/globals"
+	"github.com/Xacor/fishing_company/pkg/logger"
 	"github.com/Xacor/fishing_company/pkg/utils"
 
 	"github.com/casbin/casbin/v2"
@@ -19,7 +20,7 @@ func AuthRequired(c *gin.Context) {
 	user := session.Get(globals.Userkey)
 
 	if user == nil {
-		log.Info("User not logged in", c.Request.UserAgent())
+		log.Info("user not logged in")
 		utils.FlashMessage(c, "Для этого действия необходима аутентификация")
 
 		session.Save()
@@ -44,7 +45,7 @@ func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 			return
 		}
 		if !ok {
-			log.Warnf("User %v tries to access privileged resource", session.Get(globals.Userkey))
+			log.Warnf("user %v tries to access privileged resource", session.Get(globals.Userkey))
 			utils.FlashMessage(c, "У вас недостаточно прав на это действие")
 			session.Save()
 			c.Redirect(http.StatusSeeOther, "/")
@@ -56,26 +57,37 @@ func Authorization(e *casbin.Enforcer) gin.HandlerFunc {
 	}
 }
 
-func Logger(c *gin.Context) {
-	logClient := log.New()
+func Logger(loggingURL string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		logClient := log.New()
+		logClient.AddHook(logger.NewHook(loggingURL))
+		logClient.SetFormatter(&log.JSONFormatter{
+			FieldMap: log.FieldMap{
+				log.FieldKeyTime:  "timestamp",
+				log.FieldKeyLevel: "level",
+				log.FieldKeyMsg:   "message",
+				log.FieldKeyFunc:  "caller",
+			},
+		})
+		start := time.Now()
 
-	start := time.Now()
+		// process request
+		c.Next()
 
-	// process request
-	c.Next()
+		// End Time
+		end := time.Now()
 
-	// End Time
-	end := time.Now()
+		//execution time
+		latency := end.Sub(start)
 
-	//execution time
-	latency := end.Sub(start)
-
-	logClient.WithFields(log.Fields{
-		"ip":      c.ClientIP(),
-		"method":  c.Request.Method,
-		"path":    c.Request.URL.Path,
-		"code":    c.Writer.Status(),
-		"latency": latency,
-		"agent":   c.Request.UserAgent(),
-	}).Info()
+		logClient.WithFields(log.Fields{
+			"stream_name": globals.StreamName,
+			"ip":          c.ClientIP(),
+			"method":      c.Request.Method,
+			"path":        c.Request.URL.Path,
+			"code":        c.Writer.Status(),
+			"latency":     latency.Microseconds(),
+			"agent":       c.Request.UserAgent(),
+		}).Info()
+	}
 }
