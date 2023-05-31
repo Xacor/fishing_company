@@ -10,6 +10,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -17,7 +18,6 @@ var DB *gorm.DB
 func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, err error) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
-
 	timeoutExceeded := time.After(timeout)
 	for {
 		select {
@@ -25,7 +25,9 @@ func ConnectLoop(timeout time.Duration, dialecor gorm.Dialector) (db *gorm.DB, e
 			return nil, fmt.Errorf("db connection failed after %s timeout", timeout)
 
 		case <-ticker.C:
-			db, err := gorm.Open(dialecor)
+			db, err := gorm.Open(dialecor, &gorm.Config{
+				Logger: logger.Default.LogMode(logger.Silent),
+			})
 			if err == nil {
 				return db, nil
 			}
@@ -48,5 +50,15 @@ func Init(url string) {
 	if err = db.AutoMigrate(&models.Boat{}, &models.FishTypeTrip{}, &models.Trip{}, &models.User{}, &models.Employee{}, &models.Position{}, &models.FishType{}, &models.SeaBank{}, &models.Btype{}); err != nil {
 		log.Fatalln(err)
 	}
+
+	result := db.Find(&[]models.Role{})
+	if result.RowsAffected == 0 {
+		result := db.Create(&models.Role{ID: 1, Name: "Admin"}).Create(&models.Role{ID: 2, Name: "User"})
+		if result.Error != nil {
+			log.Fatal(result.Error)
+		}
+	}
+
 	DB = db
+
 }
