@@ -3,13 +3,15 @@ version: '3'
 services:
 
   fishing_database:
+    env_file:
+      - envs/db.env
     #Имя сервиса
     container_name: fishing_database #Имя с которым запустится контейнер
     hostname: fishing_database #Имя "хоста" которым будет считать себя контейнер
     image: mysql #Образ из которого запускается контейнер
     volumes:
       #Подключаемые директории
-      - ~/fishing_volume:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
+      - ~/fishing_volume:/var/lib/mysql:z #Директории вида хост_директория:директория_контейнера
 
     environment:
       #переменные окружения
@@ -23,20 +25,19 @@ services:
       - 3306:3306
 
     restart: unless-stopped #условие для рестарта в случае остановки контейнера
+  # fishing_webserver:
+  #   container_name: fishing_webserver
+  #   hostname: fishing_webserver
+  #   image: xacor/fishing
+  #   ports:
+  #     - 5000:5000
+  #   volumes:
+  #     - ./envs/:/usr/src/fishing_company/envs/
 
-  fishing_webserver:
-    container_name: fishing_webserver
-    hostname: fishing_webserver
-    image: xacor/fishing
-    ports:
-      - 5000:5000
-    volumes:
-      - ./envs/:/usr/src/fishing_company/envs/
+  #   environment:
+  #     - GIN_MODE=release
 
-    environment:
-      - GIN_MODE=release
+  #   restart: on-failure
 
-    restart: on-failure
-
-    depends_on:
-      - fishing_database
+  #   depends_on:
+  #     - fishing_database

@@ -81,13 +81,13 @@ func Logger(loggingURL string) gin.HandlerFunc {
 		latency := end.Sub(start)
 
 		logClient.WithFields(log.Fields{
-			"stream_name": globals.StreamName,
-			"ip":          c.ClientIP(),
-			"method":      c.Request.Method,
-			"path":        c.Request.URL.Path,
-			"code":        c.Writer.Status(),
-			"latency":     latency.Microseconds(),
-			"agent":       c.Request.UserAgent(),
+			// "stream_name": globals.StreamName,
+			"ip":      c.ClientIP(),
+			"method":  c.Request.Method,
+			"path":    c.Request.URL.Path,
+			"code":    c.Writer.Status(),
+			"latency": latency.Microseconds(),
+			"agent":   c.Request.UserAgent(),
 		}).Info()
 	}
 }

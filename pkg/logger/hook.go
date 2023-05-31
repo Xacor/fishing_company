@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 
+	"github.com/Xacor/fishing_company/pkg/globals"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,6 +21,7 @@ func (h HttpHook) Levels() []logrus.Level {
 }
 
 func (h HttpHook) Fire(entry *logrus.Entry) error {
+	entry = entry.WithField("stream_name", globals.StreamName)
 	bytesData, err := entry.Bytes()
 	if err != nil {
 		return err
