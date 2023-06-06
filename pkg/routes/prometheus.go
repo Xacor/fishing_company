@@ -11,6 +11,7 @@ func prometheusRoutes(superRoute *gin.RouterGroup) {
 	prometheus.Register(middleware.TotalRequests)         // nolint
 	prometheus.Register(middleware.ResponseStatus)        // nolint
 	prometheus.Register(middleware.ResponseTimeHistogram) // nolint
+	prometheus.Register(middleware.RequestClientIP)       // nolint
 	prometheusRouter := superRoute.Group("/")
 	prometheusRouter.GET("/metrics", gin.WrapH(promhttp.Handler()))
 

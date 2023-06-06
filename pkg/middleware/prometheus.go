@@ -29,12 +29,19 @@ var ResponseTimeHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
 }, []string{"route", "method", "status_code"})
 
+var RequestClientIP = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "http_client_ip_address",
+		Help: "Request counts from different IPs",
+	},
+	[]string{"ip-address"},
+)
+
 func Prometheus(c *gin.Context) {
 	path := c.Request.URL.Path
-	TotalRequests.WithLabelValues(path).Inc()
-
 	code := c.Writer.Status()
 	ResponseStatus.WithLabelValues(strconv.Itoa(code)).Inc()
+	RequestClientIP.WithLabelValues(c.ClientIP()).Inc()
 	start := time.Now()
 	c.Next()
 	duration := time.Since(start)
@@ -42,4 +49,5 @@ func Prometheus(c *gin.Context) {
 		c.Request.RequestURI,
 		c.Request.Method,
 		strconv.Itoa(c.Writer.Status())).Observe(duration.Seconds())
+	TotalRequests.WithLabelValues(path).Inc()
 }
