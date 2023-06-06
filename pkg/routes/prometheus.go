@@ -8,9 +8,9 @@ import (
 )
 
 func prometheusRoutes(superRoute *gin.RouterGroup) {
-	prometheus.Register(middleware.TotalRequests)
-	prometheus.Register(middleware.ResponseStatus)
-
+	prometheus.Register(middleware.TotalRequests)         // nolint
+	prometheus.Register(middleware.ResponseStatus)        // nolint
+	prometheus.Register(middleware.ResponseTimeHistogram) // nolint
 	prometheusRouter := superRoute.Group("/")
 	prometheusRouter.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
